@@ -1,0 +1,117 @@
+from datetime import datetime
+
+from gdo.base.Application import Application
+from gdo.base.GDO import GDO
+from gdo.base.GDT import GDT
+from gdo.base.Message import Message
+from gdo.core.GDO_Channel import GDO_Channel
+from gdo.core.GDO_User import GDO_User
+from gdo.core.GDT_AutoInc import GDT_AutoInc
+from gdo.core.GDT_Channel import GDT_Channel
+from gdo.core.GDT_String import GDT_String
+from gdo.core.GDT_User import GDT_User
+from gdo.date.GDT_Created import GDT_Created
+from gdo.date.GDT_Timestamp import GDT_Timestamp
+from gdo.date.Time import Time
+
+
+class GDO_ChappyMessage(GDO):
+
+    def gdo_columns(self) -> list[GDT]:
+        return [
+            GDT_AutoInc('cm_id'),
+            GDT_User('cm_sender').not_null(),
+            GDT_User('cm_user'),
+            GDT_Channel('cm_channel'),
+            GDT_String('cm_message').not_null().maxlen(1024),
+            GDT_Timestamp('cm_sent'),
+            GDT_Created('cm_created'),
+        ]
+
+    def get_sender(self) -> GDO_User:
+        return self.gdo_value('cm_sender')
+
+    def get_user(self) -> GDO_User:
+        return self.gdo_value('cm_user')
+
+    def get_channel(self) -> GDO_Channel | None:
+        return self.gdo_value('cm_channel')
+
+    def get_created(self) -> datetime:
+        return self.gdo_value('cm_created')
+
+    def get_role(self):
+        from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
+        user = self.get_sender()
+        if user.has_permission(module_chatgpt4o.PERM_CHAPPY_BOT):
+            return 'assistant'
+        return 'user'
+
+    def get_gpt_content(self):
+        timestamp = self.get_created().strftime('%Y%m%d%H%M%S')
+        user = self.get_sender()
+        chan = self.get_channel()
+        if user.is_dog():
+            user = GDO_User.system()
+
+        channel = f"#{chan.get_name()}" if chan is not None else ''
+        sid = "{" + user.get_server_id() + "}"
+        return f"{timestamp}: {user.get_displayname()}{sid}{channel}: {self.gdo_val('cm_message')}"
+
+    @classmethod
+    def incoming(cls, message: Message):
+        mark_sent = message._env_user == message._env_server.get_connector().gdo_get_dog_user()
+        return cls.incoming_text(message._comrade or message._env_user, message._env_channel, message._message, mark_sent)
+
+    @classmethod
+    def incoming_text(cls, user, channel, text, mark_sent: bool = False):
+        cls.blank({
+            'cm_sender': user.get_id(),
+            'cm_user': None if channel else user.get_id(),
+            'cm_channel': channel.get_id() if channel else None,
+            'cm_message': text,
+            'cm_sent': Time.get_date() if mark_sent else None,
+        }).insert()
+
+    @classmethod
+    def outgoing(cls, message: Message, mark_sent: bool = False):
+        cls.blank({
+            'cm_sender': message._env_server.get_connector().gdo_get_dog_user().get_id(),
+            'cm_user': message._thread_user.get_id() if message._comrade else None,
+            'cm_channel': message._env_channel.get_id() if message._env_channel else None,
+            'cm_message': message._result,
+            'cm_sent': Time.get_date() if mark_sent else None,
+        }).insert()
+
+    @classmethod
+    def genome_message(cls):
+        from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
+        return {"role": "system", "content": module_chatgpt4o.instance().cfg_genome()}
+
+    @classmethod
+    def get_messages_for_channel(cls, channel: GDO_Channel, with_genome: bool = True, mark_sent: bool = True):
+        cut = Time.get_date(Application.TIME - Time.ONE_DAY * 7)
+        condition = f"cm_channel={channel.get_id()} AND cm_created >= '{cut}'"
+        return cls.get_messages_for_condition(condition, with_genome, mark_sent)
+
+    @classmethod
+    def get_messages_for_user(cls, user: GDO_User, with_genome: bool = True, mark_sent: bool = True):
+        cut = Time.get_date(Application.TIME - Time.ONE_DAY * 7)
+        condition = f"cm_user={user.get_id()} AND cm_created > '{cut}'"
+        return cls.get_messages_for_condition(condition, with_genome, mark_sent)
+
+    @classmethod
+    def get_messages_for_condition(cls, condition: str, with_genome: bool = True, mark_sent: bool = True):
+        back = []
+        if with_genome:
+            back.append(cls.genome_message())
+        messages = cls.table().select().where(condition).order('cm_created DESC').limit(1000).exec().fetch_all()
+        messages.reverse()
+        for message in messages:
+            back.append({
+                "role": message.get_role(),
+                "content": message.get_gpt_content(),
+            })
+            if mark_sent:
+                message.save_val('cm_sent', Time.get_date())
+        return back
