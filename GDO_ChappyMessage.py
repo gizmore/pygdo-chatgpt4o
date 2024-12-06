@@ -112,6 +112,6 @@ class GDO_ChappyMessage(GDO):
                 "role": message.get_role(),
                 "content": message.get_gpt_content(),
             })
-            if mark_sent:
+            if mark_sent and message.gdo_val('cm_sent') is None:
                 message.save_val('cm_sent', Time.get_date())
         return back
