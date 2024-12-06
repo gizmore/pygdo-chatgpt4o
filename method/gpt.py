@@ -56,6 +56,7 @@ class gpt(Method):
                 # frequency_penalty=frequency_penalty,
             )
             text = response.choices[0].message.content
+            text = message.escape(text)
             message.result(text)
             await message.deliver(False)
             Application.MESSAGES.put(self.generate_chappy_response(text, message))

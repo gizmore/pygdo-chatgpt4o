@@ -76,6 +76,11 @@ class module_chatgpt4o(GDO_Module):
             GDO_ChappyRule,
         ]
 
+    def gdo_dependencies(self) -> list:
+        return [
+            'markdown',
+        ]
+
     #############
     ### Hooks ###
     #############
