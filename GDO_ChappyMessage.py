@@ -3,6 +3,7 @@ from datetime import datetime
 from gdo.base.Application import Application
 from gdo.base.GDO import GDO
 from gdo.base.GDT import GDT
+from gdo.base.Logger import Logger
 from gdo.base.Message import Message
 from gdo.core.GDO_Channel import GDO_Channel
 from gdo.core.GDO_User import GDO_User
@@ -54,7 +55,9 @@ class GDO_ChappyMessage(GDO):
         chan = self.get_channel()
         channel = f"#{chan.get_name()}" if chan is not None else ''
         sid = "{" + user.get_server_id() + "}"
-        return f"{timestamp}: {user.get_displayname()}{sid}{channel}: {self.gdo_val('cm_message')}"
+        content = f"{timestamp}: {user.get_displayname()}{sid}{channel}: {self.gdo_val('cm_message')}"
+        Logger.debug(content)
+        return content
 
     @classmethod
     def incoming(cls, message: Message):

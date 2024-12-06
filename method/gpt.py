@@ -13,6 +13,9 @@ from gdo.markdown.MDConvert import MDConvert
 
 class gpt(Method):
 
+    def gdo_trigger(self) -> str:
+        return 'gpt'
+
     def gdo_parameters(self) -> [GDT]:
         return [
             GDT_RestOfText('message').not_null(),
@@ -49,8 +52,8 @@ class gpt(Method):
             response = api.chat.completions.create(
                 model=mod.cfg_model(),
                 messages=messages,
-               # temperature=mod.cfg_temperature(),
-                # max_tokens=max_tokens,
+                temperature=mod.cfg_temperature(),
+                max_tokens=mod.cfg_max_tokens(),
                 # n=n,
                 # stop=stop,
                 # presence_penalty=presence_penalty,
@@ -63,6 +66,7 @@ class gpt(Method):
             Application.MESSAGES.put(self.generate_chappy_response(text, message))
         except Exception as ex:
             Logger.exception(ex)
+        return self.empty()
 
     def generate_chappy_response(self, text: str, msg: Message) -> Message:
         chappy = msg._env_server.get_connector().gdo_get_dog_user()

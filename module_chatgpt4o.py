@@ -50,9 +50,9 @@ class module_chatgpt4o(GDO_Module):
             GDT_Secret('gpt4_api_key').initial(apikey),
             GDT_User('gpt4_chappy'),
             GDT_Text('gpt4_genome').initial(genome),
-            GDT_Enum('gpt4_model').not_null().choices({'gpt-4o': 'GPT-4o', 'o1-mini': 'GPT-o1-mini'}).initial('o1-mini'),
+            GDT_Enum('gpt4_model').not_null().choices({'gpt-4o': 'GPT-4o', 'o1-mini': 'GPT-o1-mini'}).initial('gpt-4o'),
             GDT_Float('gpt4_temperature').min(0).max(2).initial(0.2),
-            GDT_Int('gpt4_max_tokens').min(64).max(65535),
+            GDT_Int('gpt4_max_tokens').min(64).max(65535).initial(2048),
             GDT_String('gpt4_linux_user').initial('chappy'),
         ]
 
