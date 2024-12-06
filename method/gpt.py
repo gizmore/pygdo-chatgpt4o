@@ -1,10 +1,11 @@
-from pprint import pprint
+import re
 
 from gdo.base.Application import Application
 from gdo.base.GDT import GDT
 from gdo.base.Logger import Logger
 from gdo.base.Message import Message
 from gdo.base.Method import Method
+from gdo.chatgpt.method.chappy_name import chappy_name
 from gdo.chatgpt4o.GDO_ChappyMessage import GDO_ChappyMessage
 from gdo.core.GDO_Session import GDO_Session
 from gdo.core.GDT_RestOfText import GDT_RestOfText
@@ -60,6 +61,7 @@ class gpt(Method):
                 # frequency_penalty=frequency_penalty,
             )
             text = response.choices[0].message.content
+            text = self.trim_chappies_bad_response(text)
             text = MDConvert(text).to(message._env_mode)
             message.result(text)
             await message.deliver(False)
@@ -74,3 +76,11 @@ class gpt(Method):
         new = msg.message_copy().env_user(chappy).env_session(GDO_Session.for_user(chappy)).message(text).result(None).comrade(comrade)
         return new
 
+    def trim_chappies_bad_response(self, text: str) -> str:
+        pattern = r'^\d{14}: '
+        text = re.sub(pattern, '', text)
+        chappy_name = self._env_server.get_connector().gdo_get_dog_user().render_name()
+        chappy_name = chappy_name.replace('{', '\\{').replace('}', '\\}')
+        pattern = r'^' + chappy_name + r'#?[^:]*: '
+        text = re.sub(pattern, '', text)
+        return text

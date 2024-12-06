@@ -9,7 +9,7 @@ from gdo.base.GDT import GDT
 from gdo.base.Message import Message
 from gdo.base.Util import Files
 from gdo.chatgpt4o.GDO_ChappyMessage import GDO_ChappyMessage
-from gdo.chatgpt4o.GDO_ChappyRule import GDO_ChappyRule
+from gdo.chatgpt4o.GDO_ChappyBrain import GDO_ChappyBrain
 from gdo.chatgpt4o.method.gpt import gpt
 from gdo.core.GDO_Permission import GDO_Permission
 from gdo.core.GDO_User import GDO_User
@@ -22,6 +22,7 @@ from gdo.core.GDT_String import GDT_String
 from gdo.core.GDT_Text import GDT_Text
 from gdo.core.GDT_User import GDT_User
 from gdo.core.connector.Bash import Bash
+from gdo.date.Time import Time
 
 
 class module_chatgpt4o(GDO_Module):
@@ -83,7 +84,7 @@ class module_chatgpt4o(GDO_Module):
     def gdo_classes(self):
         return [
             GDO_ChappyMessage,
-            GDO_ChappyRule,
+            GDO_ChappyBrain,
         ]
 
     def gdo_dependencies(self) -> list:
@@ -106,6 +107,7 @@ class module_chatgpt4o(GDO_Module):
     def gdo_init(self):
         Application.EVENTS.subscribe('new_message', self.on_new_message)
         Application.EVENTS.subscribe('msg_sent', self.on_message_sent)
+        Application.EVENTS.add_timer(Time.ONE_MINUTE*10, self.on_chappy_timer, 1000000000)
 
     ##########
     # Events #
@@ -120,6 +122,9 @@ class module_chatgpt4o(GDO_Module):
         GDO_ChappyMessage.outgoing(message)
         if message._thread_user:
             await gpt().env_copy(message).send_message_to_chappy(message)
+
+    async def on_chappy_timer(self):
+        pass
 
     #######
     # API #
