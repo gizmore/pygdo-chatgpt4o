@@ -14,6 +14,8 @@ from gdo.chatgpt4o.method.gpt import gpt
 from gdo.core.GDO_Permission import GDO_Permission
 from gdo.core.GDO_User import GDO_User
 from gdo.core.GDO_UserPermission import GDO_UserPermission
+from gdo.core.GDT_Enum import GDT_Enum
+from gdo.core.GDT_Float import GDT_Float
 from gdo.core.GDT_Secret import GDT_Secret
 from gdo.core.GDT_Text import GDT_Text
 from gdo.core.GDT_User import GDT_User
@@ -46,6 +48,8 @@ class module_chatgpt4o(GDO_Module):
             GDT_Secret('chatgpt4o_api_key').initial(apikey),
             GDT_User('chatgpt4o_chappy'),
             GDT_Text('chatgpt4o_genome').initial(genome),
+            GDT_Enum('chatgpt4o_model').not_null().choices({'gpt-4o': 'GPT-4o'}).initial('gpt-4o'),
+            GDT_Float('chatgpt4o_temperature').min(0).max(2).initial(0.2),
         ]
 
     def cfg_api_key(self) -> str:
@@ -56,6 +60,12 @@ class module_chatgpt4o(GDO_Module):
 
     def cfg_genome(self) -> str:
         return self.get_config_value('chatgpt4o_genome')
+
+    def cfg_model(self) -> str:
+        return self.get_config_val('chatgpt4o_model')
+
+    def cfg_temperature(self) -> float:
+        pass
 
     ##########
     # Module #
@@ -88,14 +98,12 @@ class module_chatgpt4o(GDO_Module):
 
     async def on_new_message(self, message: Message):
         GDO_ChappyMessage.incoming(message)
-        chappy = self.cfg_chappy()
-        # if not message._env_user.has_permission(self.PERM_CHAPPY_BOT):
-        if message._message.lower().startswith(f"{chappy.get_name().lower()},"):
+        if message._message.lower().startswith(f"{self.cfg_chappy().get_name().lower()},"):
             await gpt().env_copy(message).send_message_to_chappy(message)
 
     async def on_message_sent(self, message: Message):
         GDO_ChappyMessage.outgoing(message)
-        if message._comrade:
+        if message._thread_user:
             await gpt().env_copy(message).send_message_to_chappy(message)
 
     #######

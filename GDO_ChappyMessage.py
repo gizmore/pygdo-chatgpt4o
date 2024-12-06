@@ -41,9 +41,10 @@ class GDO_ChappyMessage(GDO):
         return self.gdo_value('cm_created')
 
     def get_role(self):
-        from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
         user = self.get_sender()
-        if user.has_permission(module_chatgpt4o.PERM_CHAPPY_BOT):
+        if user.is_type('system'):
+            return 'user'
+        if user == user.get_server().get_connector().gdo_get_dog_user():
             return 'assistant'
         return 'user'
 
@@ -51,9 +52,6 @@ class GDO_ChappyMessage(GDO):
         timestamp = self.get_created().strftime('%Y%m%d%H%M%S')
         user = self.get_sender()
         chan = self.get_channel()
-        if user.is_dog():
-            user = GDO_User.system()
-
         channel = f"#{chan.get_name()}" if chan is not None else ''
         sid = "{" + user.get_server_id() + "}"
         return f"{timestamp}: {user.get_displayname()}{sid}{channel}: {self.gdo_val('cm_message')}"
@@ -61,23 +59,23 @@ class GDO_ChappyMessage(GDO):
     @classmethod
     def incoming(cls, message: Message):
         mark_sent = message._env_user == message._env_server.get_connector().gdo_get_dog_user()
-        return cls.incoming_text(message._comrade or message._env_user, message._env_channel, message._message, mark_sent)
-
-    @classmethod
-    def incoming_text(cls, user, channel, text, mark_sent: bool = False):
+        user = None
+        if not message._env_channel:
+            user = message._thread_user if message._thread_user else message._env_user
+            user = user.get_id()
         cls.blank({
-            'cm_sender': user.get_id(),
-            'cm_user': None if channel else user.get_id(),
-            'cm_channel': channel.get_id() if channel else None,
-            'cm_message': text,
+            'cm_sender': message._env_user.get_id(),
+            'cm_user': user,
+            'cm_channel': message._env_channel.get_id() if message._env_channel else None,
+            'cm_message': message._message,
             'cm_sent': Time.get_date() if mark_sent else None,
         }).insert()
 
     @classmethod
     def outgoing(cls, message: Message, mark_sent: bool = False):
         cls.blank({
-            'cm_sender': message._env_server.get_connector().gdo_get_dog_user().get_id(),
-            'cm_user': message._thread_user.get_id() if message._comrade else None,
+            'cm_sender': GDO_User.system().get_id(),
+            'cm_user': message._thread_user.get_id() if message._thread_user else None,
             'cm_channel': message._env_channel.get_id() if message._env_channel else None,
             'cm_message': message._result,
             'cm_sent': Time.get_date() if mark_sent else None,
@@ -105,7 +103,7 @@ class GDO_ChappyMessage(GDO):
         back = []
         if with_genome:
             back.append(cls.genome_message())
-        messages = cls.table().select().where(condition).order('cm_created DESC').limit(1000).exec().fetch_all()
+        messages = cls.table().select().where(condition).order('cm_id DESC, cm_created DESC').limit(1000).exec().fetch_all()
         messages.reverse()
         for message in messages:
             back.append({
