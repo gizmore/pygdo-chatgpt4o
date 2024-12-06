@@ -18,8 +18,8 @@ class bash(Method):
     def gdo_trigger(self) -> str:
         return 'bash'
 
-    def gdo_user_permission(self) -> str | None:
-        return f"{module_chatgpt.PERM_CHAPPY_BOT},{GDO_Permission.ADMIN}"
+    # def gdo_user_permission(self) -> str | None:
+    #     return f"{module_chatgpt.PERM_CHAPPY_BOT},{GDO_Permission.ADMIN}"
 
     def gdo_parameters(self) -> [GDT]:
         return [
@@ -29,7 +29,7 @@ class bash(Method):
     async def gdo_execute(self):
         cmd = self.param_value('cmd')
         process = await subprocess.create_subprocess_exec(
-            "runuser", "--user", "gizmore", "bash", "-c", cmd,
+            "sudo", "-u", "chappy", "bash", "-c", cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )

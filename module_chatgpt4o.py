@@ -16,7 +16,9 @@ from gdo.core.GDO_User import GDO_User
 from gdo.core.GDO_UserPermission import GDO_UserPermission
 from gdo.core.GDT_Enum import GDT_Enum
 from gdo.core.GDT_Float import GDT_Float
+from gdo.core.GDT_Int import GDT_Int
 from gdo.core.GDT_Secret import GDT_Secret
+from gdo.core.GDT_String import GDT_String
 from gdo.core.GDT_Text import GDT_Text
 from gdo.core.GDT_User import GDT_User
 from gdo.core.connector.Bash import Bash
@@ -42,30 +44,38 @@ class module_chatgpt4o(GDO_Module):
             pass
         try:
             genome = Files.get_contents(self.file_path('genome.txt'))
-        except Exception:
+        except FileNotFoundError:
             pass
         return [
-            GDT_Secret('chatgpt4o_api_key').initial(apikey),
-            GDT_User('chatgpt4o_chappy'),
-            GDT_Text('chatgpt4o_genome').initial(genome),
-            GDT_Enum('chatgpt4o_model').not_null().choices({'gpt-4o': 'GPT-4o', 'o1-mini': 'GPT-1o-mini'}).initial('o1-mini'),
-            GDT_Float('chatgpt4o_temperature').min(0).max(2).initial(0.2),
+            GDT_Secret('gpt4_api_key').initial(apikey),
+            GDT_User('gpt4_chappy'),
+            GDT_Text('gpt4_genome').initial(genome),
+            GDT_Enum('gpt4_model').not_null().choices({'gpt-4o': 'GPT-4o', 'o1-mini': 'GPT-o1-mini'}).initial('o1-mini'),
+            GDT_Float('gpt4_temperature').min(0).max(2).initial(0.2),
+            GDT_Int('gpt4_max_tokens').min(64).max(65535),
+            GDT_String('gpt4_linux_user').initial('chappy'),
         ]
 
     def cfg_api_key(self) -> str:
-        return self.get_config_val('chatgpt4o_api_key')
+        return self.get_config_val('gpt4_api_key')
 
     def cfg_chappy(self) -> GDO_User:
-        return self.get_config_value('chatgpt4o_chappy')
+        return self.get_config_value('gpt4_chappy')
 
     def cfg_genome(self) -> str:
-        return self.get_config_value('chatgpt4o_genome')
+        return self.get_config_value('gpt4_genome')
 
     def cfg_model(self) -> str:
-        return self.get_config_val('chatgpt4o_model')
+        return self.get_config_val('gpt4_model')
 
     def cfg_temperature(self) -> float:
-        pass
+        return self.get_config_value('gpt4_temperature')
+
+    def cfg_max_tokens(self) -> int:
+        return self.get_config_value('gpt4_max_tokens')
+
+    def cfg_linux_user(self) -> str:
+        return self.get_config_val('gpt4_linux_user')
 
     ##########
     # Module #
@@ -88,7 +98,7 @@ class module_chatgpt4o(GDO_Module):
     def gdo_install(self):
         Files.create_dir(Application.file_path(Application.config('file.directory') + 'chatgpt4o/'))
         chappy = Bash.get_server().get_or_create_user('chappy')
-        self.save_config_val('chatgpt4o_chappy', chappy.get_id())
+        self.save_config_val('gpt4_chappy', chappy.get_id())
         GDO_Permission.get_or_create(self.PERM_CHAPPY_BOT)
         GDO_Permission.get_or_create(self.PERM_CHAPPY_USER)
         GDO_UserPermission.grant(chappy, self.PERM_CHAPPY_BOT)

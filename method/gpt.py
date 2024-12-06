@@ -8,6 +8,7 @@ from gdo.base.Method import Method
 from gdo.chatgpt4o.GDO_ChappyMessage import GDO_ChappyMessage
 from gdo.core.GDO_Session import GDO_Session
 from gdo.core.GDT_RestOfText import GDT_RestOfText
+from gdo.markdown.MDConvert import MDConvert
 
 
 class gpt(Method):
@@ -56,7 +57,7 @@ class gpt(Method):
                 # frequency_penalty=frequency_penalty,
             )
             text = response.choices[0].message.content
-            text = message.escape(text)
+            text = MDConvert(text).to(message._env_mode)
             message.result(text)
             await message.deliver(False)
             Application.MESSAGES.put(self.generate_chappy_response(text, message))
