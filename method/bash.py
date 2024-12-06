@@ -4,6 +4,7 @@ from gdo.base.GDT import GDT
 from gdo.base.Method import Method
 from gdo.base.Trans import t
 from gdo.base.Util import html
+from gdo.core.GDO_Permission import GDO_Permission
 from gdo.core.GDT_RestOfText import GDT_RestOfText
 
 
@@ -16,8 +17,8 @@ class bash(Method):
     def gdo_trigger(self) -> str:
         return 'bash'
 
-    # def gdo_user_permission(self) -> str | None:
-    #     return f"{module_chatgpt.PERM_CHAPPY_BOT},{GDO_Permission.ADMIN}"
+    def gdo_user_permission(self) -> str | None:
+        return GDO_Permission.ADMIN
 
     def gdo_parameters(self) -> [GDT]:
         return [

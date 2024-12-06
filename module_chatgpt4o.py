@@ -1,4 +1,5 @@
 import functools
+from pyexpat.errors import messages
 
 import tomlkit
 from openai import OpenAI
@@ -8,6 +9,7 @@ from gdo.base.GDO_Module import GDO_Module
 from gdo.base.GDT import GDT
 from gdo.base.Message import Message
 from gdo.base.Util import Files
+from gdo.chatgpt.method.chappy_name import chappy_name
 from gdo.chatgpt4o.GDO_ChappyMessage import GDO_ChappyMessage
 from gdo.chatgpt4o.GDO_ChappyBrain import GDO_ChappyBrain
 from gdo.chatgpt4o.method.gpt import gpt
@@ -115,7 +117,10 @@ class module_chatgpt4o(GDO_Module):
 
     async def on_new_message(self, message: Message):
         GDO_ChappyMessage.incoming(message)
-        if message._message.lower().startswith(f"{self.cfg_chappy().get_name().lower()},"):
+        dog = self.cfg_chappy().get_name().lower()
+        chappy = message._env_server.get_connector().gdo_get_dog_user().get_name().lower()
+        text = message._message.lower().rstrip(r'!?{0123456789}')
+        if text.startswith(chappy) or text.endswith(chappy) or text.startswith(dog) or text.endswith(dog):
             await gpt().env_copy(message).send_message_to_chappy(message)
 
     async def on_message_sent(self, message: Message):

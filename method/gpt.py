@@ -64,7 +64,7 @@ class gpt(Method):
             text = self.trim_chappies_bad_response(text)
             text = MDConvert(text).to(message._env_mode)
             message.result(text)
-            await message.deliver(False)
+            await message.deliver(False, False)
             Application.MESSAGES.put(self.generate_chappy_response(text, message))
         except Exception as ex:
             Logger.exception(ex)

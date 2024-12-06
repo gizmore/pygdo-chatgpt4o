@@ -108,7 +108,7 @@ class GDO_ChappyMessage(GDO):
         back = []
         if with_genome:
             back.append(cls.genome_message())
-        messages = cls.table().select().where(condition).order('cm_id DESC, cm_created DESC').limit(100).exec().fetch_all()
+        messages = cls.table().select().where(condition).order('cm_id DESC, cm_created DESC').limit(256).exec().fetch_all()
         messages.reverse()
         for message in messages:
             back.append({
