@@ -48,7 +48,7 @@ class gpt(Method):
             response = api.chat.completions.create(
                 model=mod.cfg_model(),
                 messages=messages,
-                temperature=mod.cfg_temperature(),
+               # temperature=mod.cfg_temperature(),
                 # max_tokens=max_tokens,
                 # n=n,
                 # stop=stop,

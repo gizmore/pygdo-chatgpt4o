@@ -75,7 +75,7 @@ class GDO_ChappyMessage(GDO):
     def outgoing(cls, message: Message, mark_sent: bool = False):
         cls.blank({
             'cm_sender': GDO_User.system().get_id(),
-            'cm_user': message._thread_user.get_id() if message._thread_user else None,
+            'cm_user': message._thread_user.get_id() if message._thread_user else message._env_user.get_id(),
             'cm_channel': message._env_channel.get_id() if message._env_channel else None,
             'cm_message': message._result,
             'cm_sent': Time.get_date() if mark_sent else None,
@@ -84,7 +84,9 @@ class GDO_ChappyMessage(GDO):
     @classmethod
     def genome_message(cls):
         from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
-        return {"role": "system", "content": module_chatgpt4o.instance().cfg_genome()}
+        mod = module_chatgpt4o.instance()
+        role = 'user' if mod.cfg_model().startswith('o1') else 'system'
+        return {"role": role, "content": mod.cfg_genome()}
 
     @classmethod
     def get_messages_for_channel(cls, channel: GDO_Channel, with_genome: bool = True, mark_sent: bool = True):

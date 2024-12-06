@@ -48,7 +48,7 @@ class module_chatgpt4o(GDO_Module):
             GDT_Secret('chatgpt4o_api_key').initial(apikey),
             GDT_User('chatgpt4o_chappy'),
             GDT_Text('chatgpt4o_genome').initial(genome),
-            GDT_Enum('chatgpt4o_model').not_null().choices({'gpt-4o': 'GPT-4o'}).initial('gpt-4o'),
+            GDT_Enum('chatgpt4o_model').not_null().choices({'gpt-4o': 'GPT-4o', 'o1-mini': 'GPT-1o-mini'}).initial('o1-mini'),
             GDT_Float('chatgpt4o_temperature').min(0).max(2).initial(0.2),
         ]
 
