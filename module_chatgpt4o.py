@@ -124,14 +124,12 @@ class module_chatgpt4o(GDO_Module):
             if not gpt.PROCESSING:
                 gpt.PROCESSING = True
                 await gpt().env_copy(message).send_message_to_chappy(message)
-                gpt.PROCESSING = False
 
     async def on_message_sent(self, message: Message):
         GDO_ChappyMessage.outgoing(message)
         if message._thread_user and not gpt.PROCESSING:
             gpt.PROCESSING = True
             await gpt().env_copy(message).send_message_to_chappy(message)
-            gpt.PROCESSING = False
 
     async def on_chappy_timer(self):
         pass

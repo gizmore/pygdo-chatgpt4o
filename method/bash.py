@@ -1,6 +1,7 @@
 from asyncio import subprocess
 
 from gdo.base.GDT import GDT
+from gdo.base.Logger import Logger
 from gdo.base.Method import Method
 from gdo.base.Trans import t
 from gdo.base.Util import html
@@ -27,7 +28,8 @@ class bash(Method):
 
     async def gdo_execute(self):
         cmd = self.param_value('cmd')
-        process =  await subprocess.create_subprocess_exec(
+        Logger.debug(cmd)
+        process = await subprocess.create_subprocess_exec(
             "sudo", "-u", "chappy", "bash", "-c", f"cd ~ && {cmd}",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
@@ -35,6 +37,8 @@ class bash(Method):
         stdout, stderr = await process.communicate()
         stdout_decoded = stdout.decode('utf-8').strip().splitlines()
         stderr_decoded = stderr.decode('utf-8').strip().splitlines()
+        Logger.debug(str(stderr_decoded))
         if process.returncode != 0:
-            return self.error_raw(f"Error({process.returncode}): {html('\n'.join(stderr_decoded)) or t('msg_unknown_error')}")
+            return self.err('err_error', [html('\n'.join(stderr_decoded)) or t('msg_unknown_error')])
         return self.reply('%s', [html('\n'.join(stdout_decoded)) or t("msg_success")])
+

@@ -1,1 +1,6 @@
-module_chatgpt4o = "Chatgpt4O"
+module_chatgpt4o = "Chatgpt4o"
+
+mt_chatgpt4o_bash = "Bash"
+md_chatgpt4o_bash = "Execute any bash command in the name of chappy."
+err_error = "Error: %s"
+msg_success = "The command returned success(0) but no output was generated."

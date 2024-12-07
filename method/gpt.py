@@ -5,7 +5,6 @@ from gdo.base.GDT import GDT
 from gdo.base.Logger import Logger
 from gdo.base.Message import Message
 from gdo.base.Method import Method
-from gdo.chatgpt.method.chappy_name import chappy_name
 from gdo.chatgpt4o.GDO_ChappyMessage import GDO_ChappyMessage
 from gdo.core.GDO_Session import GDO_Session
 from gdo.core.GDT_RestOfText import GDT_RestOfText
@@ -15,9 +14,13 @@ from gdo.markdown.MDConvert import MDConvert
 class gpt(Method):
 
     PROCESSING: bool = False
+    # LAST_RESPONSE: str = ""
 
     def gdo_trigger(self) -> str:
         return 'gpt'
+
+    def gdo_default_enabled(self) -> bool:
+        return False
 
     def gdo_parameters(self) -> [GDT]:
         return [
@@ -62,12 +65,15 @@ class gpt(Method):
                 # presence_penalty=presence_penalty,
                 # frequency_penalty=frequency_penalty,
             )
+            self.__class__.PROCESSING = False
             text = response.choices[0].message.content
             text = self.trim_chappies_bad_response(text)
             text = MDConvert(text).to(message._env_mode)
             message.result(text)
             await message.deliver(False, False)
+            # if text != self.__class__.LAST_RESPONSE:
             Application.MESSAGES.put(self.generate_chappy_response(text, message))
+                # self.__class__.LAST_RESPONSE = text
         except Exception as ex:
             Logger.exception(ex)
         return self.empty()
