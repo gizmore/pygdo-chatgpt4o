@@ -119,7 +119,7 @@ class module_chatgpt4o(GDO_Module):
         GDO_ChappyMessage.incoming(message)
         dog = self.cfg_chappy().get_name().lower()
         chappy = message._env_server.get_connector().gdo_get_dog_user().get_name().lower()
-        text = message._message.lower().rstrip(r'!?{0123456789}')
+        text = message._message.lower().rstrip('!?{0123456789}\x01\x02\x00\x03')
         if text.startswith(chappy) or text.endswith(chappy) or text.startswith(dog) or text.endswith(dog):
             await gpt().env_copy(message).send_message_to_chappy(message)
 

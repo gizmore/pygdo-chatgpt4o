@@ -81,6 +81,6 @@ class gpt(Method):
         text = re.sub(pattern, '', text)
         chappy_name = self._env_server.get_connector().gdo_get_dog_user().render_name()
         chappy_name = chappy_name.replace('{', '\\{').replace('}', '\\}')
-        pattern = r'^' + chappy_name + r'#?[^:]*: '
+        pattern = r'^' + chappy_name + r'[^:]*: '
         text = re.sub(pattern, '', text)
         return text

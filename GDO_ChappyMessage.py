@@ -53,10 +53,10 @@ class GDO_ChappyMessage(GDO):
         timestamp = self.get_created().strftime('%Y%m%d%H%M%S')
         user = self.get_sender()
         chan = self.get_channel()
-        channel = f"#{chan.get_name()}" if chan is not None else ''
+        channel = chan.get_name() if chan is not None else ''
         sid = "{" + user.get_server_id() + "}"
         content = f"{timestamp}: {user.get_displayname()}{sid}{channel}: {self.gdo_val('cm_message')}"
-        Logger.debug(content)
+        # Logger.debug(content)
         return content
 
     @classmethod
@@ -108,7 +108,7 @@ class GDO_ChappyMessage(GDO):
         back = []
         if with_genome:
             back.append(cls.genome_message())
-        messages = cls.table().select().where(condition).order('cm_id DESC, cm_created DESC').limit(256).exec().fetch_all()
+        messages = cls.table().select().where(condition).order('cm_id DESC').limit(100).exec().fetch_all()
         messages.reverse()
         for message in messages:
             back.append({
