@@ -10,6 +10,7 @@ from gdo.core.GDO_User import GDO_User
 from gdo.core.GDT_AutoInc import GDT_AutoInc
 from gdo.core.GDT_Channel import GDT_Channel
 from gdo.core.GDT_String import GDT_String
+from gdo.core.GDT_Text import GDT_Text
 from gdo.core.GDT_User import GDT_User
 from gdo.date.GDT_Created import GDT_Created
 from gdo.date.GDT_Timestamp import GDT_Timestamp
@@ -24,7 +25,7 @@ class GDO_ChappyMessage(GDO):
             GDT_User('cm_sender').not_null(),
             GDT_User('cm_user'),
             GDT_Channel('cm_channel'),
-            GDT_String('cm_message').not_null().maxlen(1024),
+            GDT_Text('cm_message').not_null(),
             GDT_Timestamp('cm_sent'),
             GDT_Created('cm_created'),
         ]

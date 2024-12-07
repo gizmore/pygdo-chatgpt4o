@@ -7,6 +7,7 @@ from gdo.base.Message import Message
 from gdo.base.Method import Method
 from gdo.chatgpt4o.GDO_ChappyMessage import GDO_ChappyMessage
 from gdo.core.GDO_Session import GDO_Session
+from gdo.core.GDT_Float import GDT_Float
 from gdo.core.GDT_RestOfText import GDT_RestOfText
 from gdo.markdown.MDConvert import MDConvert
 
@@ -26,6 +27,22 @@ class gpt(Method):
         return [
             GDT_RestOfText('message').not_null(),
         ]
+
+    def gdo_method_config_user(self) -> [GDT]:
+        return [
+            GDT_Float('temperature').min(0).max(2).initial("0.2"),
+        ]
+
+    def gdo_method_config_channel(self) -> [GDT]:
+        return [
+            GDT_Float('temperature').min(0).max(2).initial("0.2"),
+        ]
+
+    def cfg_temperature(self, message: Message) -> float:
+        if message._env_channel:
+            return self.get_config_channel_value('temperature')
+        else:
+            return self.get_config_user_value('temperature')
 
     async def gdo_execute(self):
         text = self.param_value('message')
@@ -58,7 +75,7 @@ class gpt(Method):
             response = api.chat.completions.create(
                 model=mod.cfg_model(),
                 messages=messages,
-                temperature=mod.cfg_temperature(),
+                temperature=self.cfg_temperature(message),
                 max_tokens=mod.cfg_max_tokens(),
                 # n=n,
                 # stop=stop,
@@ -70,6 +87,8 @@ class gpt(Method):
             text = self.trim_chappies_bad_response(text)
             text = MDConvert(text).to(message._env_mode)
             message.result(text)
+            comrade = message._thread_user if message._thread_user else message._env_user
+            message.comrade(comrade)
             await message.deliver(False, False)
             # if text != self.__class__.LAST_RESPONSE:
             Application.MESSAGES.put(self.generate_chappy_response(text, message))
