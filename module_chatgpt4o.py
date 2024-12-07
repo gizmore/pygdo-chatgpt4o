@@ -121,12 +121,17 @@ class module_chatgpt4o(GDO_Module):
         chappy = message._env_server.get_connector().gdo_get_dog_user().get_name().lower()
         text = message._message.lower().rstrip('!?{0123456789}\x01\x02\x00\x03')
         if text.startswith(chappy) or text.endswith(chappy) or text.startswith(dog) or text.endswith(dog):
-            await gpt().env_copy(message).send_message_to_chappy(message)
+            if not gpt.PROCESSING:
+                gpt.PROCESSING = True
+                await gpt().env_copy(message).send_message_to_chappy(message)
+                gpt.PROCESSING = False
 
     async def on_message_sent(self, message: Message):
         GDO_ChappyMessage.outgoing(message)
-        if message._thread_user:
+        if message._thread_user and not gpt.PROCESSING:
+            gpt.PROCESSING = True
             await gpt().env_copy(message).send_message_to_chappy(message)
+            gpt.PROCESSING = False
 
     async def on_chappy_timer(self):
         pass

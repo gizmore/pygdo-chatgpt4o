@@ -14,6 +14,8 @@ from gdo.markdown.MDConvert import MDConvert
 
 class gpt(Method):
 
+    PROCESSING: bool = False
+
     def gdo_trigger(self) -> str:
         return 'gpt'
 
