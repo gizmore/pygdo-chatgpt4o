@@ -116,7 +116,7 @@ class GDO_ChappyMessage(GDO):
         if with_genome:
             back.append(cls.genome_message(message))
         context_window_size = gpt().env_copy(message).cfg_window_size(message)
-        messages = cls.table().select().where(condition).order('cm_id DESC').limit(context_window_size).exec().fetch_all()
+        messages = cls.table().select().where(condition).order('cm_id DESC').limit(int(context_window_size)).exec().fetch_all()
         messages.reverse()
         for msg in messages:
             back.append({
