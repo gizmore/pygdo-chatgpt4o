@@ -3,13 +3,11 @@ from datetime import datetime
 from gdo.base.Application import Application
 from gdo.base.GDO import GDO
 from gdo.base.GDT import GDT
-from gdo.base.Logger import Logger
 from gdo.base.Message import Message
 from gdo.core.GDO_Channel import GDO_Channel
 from gdo.core.GDO_User import GDO_User
 from gdo.core.GDT_AutoInc import GDT_AutoInc
 from gdo.core.GDT_Channel import GDT_Channel
-from gdo.core.GDT_String import GDT_String
 from gdo.core.GDT_Text import GDT_Text
 from gdo.core.GDT_User import GDT_User
 from gdo.date.GDT_Created import GDT_Created
@@ -57,7 +55,6 @@ class GDO_ChappyMessage(GDO):
         channel = chan.render_name()if chan is not None else ''
         sid = "{" + user.get_server_id() + "}"
         content = f"{timestamp}: {user.get_displayname()}{sid}{channel}: {self.gdo_val('cm_message')}"
-        # Logger.debug(content)
         return content
 
     @classmethod
@@ -89,36 +86,43 @@ class GDO_ChappyMessage(GDO):
         }).insert()
 
     @classmethod
-    def genome_message(cls):
+    def genome_message(cls, message: Message):
+        from gdo.chatgpt4o.method.goal import goal
         from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
         mod = module_chatgpt4o.instance()
         role = 'user' if mod.cfg_model().startswith('o1') else 'system'
-        return {"role": role, "content": mod.cfg_genome()}
+        content = mod.cfg_genome()
+        the_goal = goal().env_copy(message).cfg_goal()
+        content += f"Your current goal here is: {the_goal}\n"
+        return {"role": role, "content": content}
 
     @classmethod
-    def get_messages_for_channel(cls, channel: GDO_Channel, with_genome: bool = True, mark_sent: bool = True):
+    def get_messages_for_channel(cls, message: Message, with_genome: bool = True, mark_sent: bool = True):
         cut = Time.get_date(Application.TIME - Time.ONE_DAY * 7)
-        condition = f"cm_channel={channel.get_id()} AND cm_created >= '{cut}'"
-        return cls.get_messages_for_condition(condition, with_genome, mark_sent)
+        condition = f"cm_channel={message._env_channel.get_id()} AND cm_created >= '{cut}'"
+        return cls.get_messages_for_condition(message, condition, with_genome, mark_sent)
 
     @classmethod
-    def get_messages_for_user(cls, user: GDO_User, with_genome: bool = True, mark_sent: bool = True):
+    def get_messages_for_user(cls, message: Message, with_genome: bool = True, mark_sent: bool = True):
         cut = Time.get_date(Application.TIME - Time.ONE_DAY * 7)
+        user = message._thread_user if message._thread_user else message._env_user
         condition = f"cm_user={user.get_id()} AND cm_created > '{cut}'"
-        return cls.get_messages_for_condition(condition, with_genome, mark_sent)
+        return cls.get_messages_for_condition(message, condition, with_genome, mark_sent)
 
     @classmethod
-    def get_messages_for_condition(cls, condition: str, with_genome: bool = True, mark_sent: bool = True):
+    def get_messages_for_condition(cls, message: Message, condition: str, with_genome: bool = True, mark_sent: bool = True):
+        from gdo.chatgpt4o.method.gpt import gpt
         back = []
         if with_genome:
-            back.append(cls.genome_message())
-        messages = cls.table().select().where(condition).order('cm_id DESC').limit(100).exec().fetch_all()
+            back.append(cls.genome_message(message))
+        context_window_size = gpt().env_copy(message).cfg_window_size(message)
+        messages = cls.table().select().where(condition).order('cm_id DESC').limit(context_window_size).exec().fetch_all()
         messages.reverse()
-        for message in messages:
+        for msg in messages:
             back.append({
-                "role": message.get_role(),
-                "content": message.get_gpt_content(),
+                "role": msg.get_role(),
+                "content": msg.get_gpt_content(),
             })
-            if mark_sent and message.gdo_val('cm_sent') is None:
-                message.save_val('cm_sent', Time.get_date())
+            if mark_sent and msg.gdo_val('cm_sent') is None:
+                msg.save_val('cm_sent', Time.get_date())
         return back

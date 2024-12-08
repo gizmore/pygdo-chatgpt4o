@@ -39,6 +39,6 @@ class bash(Method):
         stderr_decoded = stderr.decode('utf-8').strip().splitlines()
         Logger.debug(str(stderr_decoded))
         if process.returncode != 0:
-            return self.err('err_error', [html('\n'.join(stderr_decoded)) or t('msg_unknown_error')])
+            return self.err('err_error', [html('\n'.join(stderr_decoded)) or t('unknown_error')])
         return self.reply('%s', [html('\n'.join(stdout_decoded)) or t("msg_success")])
 

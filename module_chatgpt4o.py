@@ -54,8 +54,7 @@ class module_chatgpt4o(GDO_Module):
             GDT_User('gpt4_chappy'),
             GDT_Text('gpt4_genome').initial(genome),
             GDT_Enum('gpt4_model').not_null().choices({'gpt-4o': 'GPT-4o', 'o1-mini': 'GPT-o1-mini'}).initial('gpt-4o'),
-            GDT_Float('gpt4_temperature').min(0).max(2).initial(0.2),
-            GDT_Int('gpt4_max_tokens').min(64).max(65535).initial(2048),
+            GDT_Int('gpt4_max_tokens').min(32).max(8192).initial(512),
             GDT_String('gpt4_linux_user').initial('chappy'),
         ]
 
@@ -70,9 +69,6 @@ class module_chatgpt4o(GDO_Module):
 
     def cfg_model(self) -> str:
         return self.get_config_val('gpt4_model')
-
-    def cfg_temperature(self) -> float:
-        return self.get_config_value('gpt4_temperature')
 
     def cfg_max_tokens(self) -> int:
         return self.get_config_value('gpt4_max_tokens')
@@ -106,7 +102,7 @@ class module_chatgpt4o(GDO_Module):
         GDO_Permission.get_or_create(self.PERM_CHAPPY_USER)
         GDO_UserPermission.grant(chappy, self.PERM_CHAPPY_BOT)
 
-    def gdo_init(self):
+    def gdo_subscribe_events(self):
         Application.EVENTS.subscribe('new_message', self.on_new_message)
         Application.EVENTS.subscribe('msg_sent', self.on_message_sent)
         Application.EVENTS.add_timer(Time.ONE_MINUTE*10, self.on_chappy_timer, 1000000000)
@@ -119,17 +115,25 @@ class module_chatgpt4o(GDO_Module):
         GDO_ChappyMessage.incoming(message)
         dog = self.cfg_chappy().get_name().lower()
         chappy = message._env_server.get_connector().gdo_get_dog_user().get_name().lower()
-        text = message._message.lower().rstrip('!?{0123456789}\x01\x02\x00\x03')
-        if text.startswith(chappy) or text.endswith(chappy) or text.startswith(dog) or text.endswith(dog):
+        text = message._message.lower().rstrip("!?{0123456789}\x00\x01\x02\x03").lstrip('@')
+        if text.startswith(chappy) or text.startswith('chap') or text.endswith(chappy) or text.startswith(dog) or text.endswith(dog):
             if not gpt.PROCESSING:
                 gpt.PROCESSING = True
-                await gpt().env_copy(message).send_message_to_chappy(message)
+                try:
+                    await gpt().env_copy(message).send_message_to_chappy(message)
+                except Exception as ex:
+                    gpt.PROCESSING = False
+                    raise ex
 
     async def on_message_sent(self, message: Message):
         GDO_ChappyMessage.outgoing(message)
         if message._thread_user and not gpt.PROCESSING:
             gpt.PROCESSING = True
-            await gpt().env_copy(message).send_message_to_chappy(message)
+            try:
+                await gpt().env_copy(message).send_message_to_chappy(message)
+            except Exception as ex:
+                gpt.PROCESSING = False
+                raise ex
 
     async def on_chappy_timer(self):
         pass

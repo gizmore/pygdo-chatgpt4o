@@ -9,10 +9,12 @@ from gdo.chatgpt4o.GDO_ChappyMessage import GDO_ChappyMessage
 from gdo.core.GDO_Session import GDO_Session
 from gdo.core.GDT_Float import GDT_Float
 from gdo.core.GDT_RestOfText import GDT_RestOfText
+from gdo.core.GDT_UInt import GDT_UInt
 from gdo.markdown.MDConvert import MDConvert
 
 
 class gpt(Method):
+
 
     PROCESSING: bool = False
     # LAST_RESPONSE: str = ""
@@ -30,12 +32,14 @@ class gpt(Method):
 
     def gdo_method_config_user(self) -> [GDT]:
         return [
-            GDT_Float('temperature').min(0).max(2).initial("0.2"),
+            GDT_Float('temperature').min(0).max(0.5).initial("0.1"),
+            GDT_Float('window_size').min(0).max(50).initial("25"),
         ]
 
     def gdo_method_config_channel(self) -> [GDT]:
         return [
-            GDT_Float('temperature').min(0).max(2).initial("0.2"),
+            GDT_Float('temperature').min(0).max(0.8).initial("0.1"),
+            GDT_UInt('window_size').min(0).max(100).initial("50"),
         ]
 
     def cfg_temperature(self, message: Message) -> float:
@@ -43,6 +47,12 @@ class gpt(Method):
             return self.get_config_channel_value('temperature')
         else:
             return self.get_config_user_value('temperature')
+
+    def cfg_window_size(self, message: Message) -> int:
+        if message._env_channel:
+            return self.get_config_channel_value('window_size')
+        else:
+            return self.get_config_user_value('window_size')
 
     async def gdo_execute(self):
         text = self.param_value('message')
@@ -60,11 +70,11 @@ class gpt(Method):
             return await self.send_user_to_chappy(message)
 
     async def send_channel_to_chappy(self, message: Message):
-        messages = GDO_ChappyMessage.get_messages_for_channel(message._env_channel)
+        messages = GDO_ChappyMessage.get_messages_for_channel(message)
         return await self.send_to_chappy(message, messages)
 
     async def send_user_to_chappy(self, message: Message):
-        messages = GDO_ChappyMessage.get_messages_for_user(message._thread_user if message._thread_user else message._env_user)
+        messages = GDO_ChappyMessage.get_messages_for_user(message)
         return await self.send_to_chappy(message, messages)
 
     async def send_to_chappy(self, message: Message, messages: list):
@@ -92,15 +102,13 @@ class gpt(Method):
             await message.deliver(False, False)
             # if text != self.__class__.LAST_RESPONSE:
             Application.MESSAGES.put(self.generate_chappy_response(text, message))
-                # self.__class__.LAST_RESPONSE = text
         except Exception as ex:
             Logger.exception(ex)
         return self.empty()
 
     def generate_chappy_response(self, text: str, msg: Message) -> Message:
         chappy = msg._env_server.get_connector().gdo_get_dog_user()
-        comrade = msg._thread_user if msg._thread_user else msg._env_user
-        new = msg.message_copy().env_user(chappy).env_session(GDO_Session.for_user(chappy)).message(text).result(None).comrade(comrade)
+        new = msg.message_copy().env_user(chappy).env_session(GDO_Session.for_user(chappy)).message(text).result(None)
         return new
 
     def trim_chappies_bad_response(self, text: str) -> str:
