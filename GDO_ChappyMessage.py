@@ -54,7 +54,7 @@ class GDO_ChappyMessage(GDO):
         timestamp = self.get_created().strftime('%Y%m%d%H%M%S')
         user = self.get_sender()
         chan = self.get_channel()
-        channel = chan.get_name() if chan is not None else ''
+        channel = chan.render_name()if chan is not None else ''
         sid = "{" + user.get_server_id() + "}"
         content = f"{timestamp}: {user.get_displayname()}{sid}{channel}: {self.gdo_val('cm_message')}"
         # Logger.debug(content)
