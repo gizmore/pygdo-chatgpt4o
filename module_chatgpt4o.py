@@ -113,7 +113,7 @@ class module_chatgpt4o(GDO_Module):
 
     async def on_new_message(self, message: Message):
         GDO_ChappyMessage.incoming(message)
-        dog = self.cfg_chappy().get_name().lower()
+        dog = self.cfg_chappy().get_displayname().lower()
         chappy = message._env_server.get_connector().gdo_get_dog_user().get_name().lower()
         text = message._message.lower().rstrip("!?{0123456789}\x00\x01\x02\x03").lstrip('@')
         if text.startswith(chappy) or text.startswith('chap') or text.endswith(chappy) or text.startswith(dog) or text.endswith(dog):

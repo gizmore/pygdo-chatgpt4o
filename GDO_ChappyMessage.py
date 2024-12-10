@@ -4,6 +4,7 @@ from gdo.base.Application import Application
 from gdo.base.GDO import GDO
 from gdo.base.GDT import GDT
 from gdo.base.Message import Message
+from gdo.chatgpt4o.GDO_ChappyBrain import GDO_ChappyBrain
 from gdo.core.GDO_Channel import GDO_Channel
 from gdo.core.GDO_User import GDO_User
 from gdo.core.GDT_AutoInc import GDT_AutoInc
@@ -94,6 +95,9 @@ class GDO_ChappyMessage(GDO):
         content = mod.cfg_genome()
         the_goal = goal().env_copy(message).cfg_goal()
         content += f"Your current goal here is: {the_goal}\n"
+        content += f"You can control the following content with $remember and $forget:\n"
+        content += GDO_ChappyBrain.get_content()
+        content += "\n"
         return {"role": role, "content": content}
 
     @classmethod
