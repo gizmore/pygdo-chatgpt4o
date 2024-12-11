@@ -33,7 +33,7 @@ class bash(Method):
         cmd = self.get_command().replace('"', '\\"')
         Logger.debug(cmd)
         process = await subprocess.create_subprocess_exec(
-            "bash", "-c", f"cd ~ && {cmd}",
+            "timeout", "10s", "bash", "-c", f"cd ~ && {cmd}",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )

@@ -30,12 +30,14 @@ class tune(Method):
 			return self.train_messages()
 
 	def train_messages(self):
-		from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
-		mod = module_chatgpt4o.instance()
-		api = mod.get_openai()
-		messages = GDO_ChappyMessage.table().select().where(f'cm_training IS NULL').exec()
+		# from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
+		# mod = module_chatgpt4o.instance()
+		# api = mod.get_openai()
+		messages = GDO_ChappyMessage.table().select().where(f'cm_training IS NULL').order('cm_id ASC').exec()
 		output_path = Application.temp_path('pygdo_training.jsonl')
 		count = 0
+		count_too_long = 0
+		count_no_chappy = 0
 		current = []
 		grouped = []
 		has_chappy = False
@@ -45,17 +47,24 @@ class tune(Method):
 					grouped.append(current)
 				current = []
 				has_chappy = False
-			if message.is_from_chappy():
+			elif message.is_from_chappy():
 				has_chappy = True
 			current.append({'role': message.get_role(), 'content': message.get_gpt_content()})
 			message.save_val('cm_training', Time.get_date())
 		with open(output_path, 'w') as out:
 			for thread in grouped:
 				example = {"messages": thread}
-				out.write(json.dumps(example))
+				jsonl = json.dumps(example)
+				if len(jsonl) > 1024:
+					count_too_long += 1
+					continue
+				if thread[-1]['role'] != "assistant":
+					count_no_chappy += 1
+					continue
+				out.write(jsonl)
 				out.write('\n')
 				count += 1
-		return self.reply('msg_training_file_generated', [count, output_path])
+		return self.reply('msg_training_file_generated', [count, output_path, count_too_long, count_no_chappy])
 
 	def train_pygdo(self):
 		from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
@@ -74,7 +83,6 @@ class tune(Method):
 								fullpath = f"{root}/{file}".replace('//', '/')
 								example = {
 									"messages": [
-										{"role": "system", "content": f"You will remember the sourcecode of {fullpath}"},
 										{"role": "user", "content": f"What is the sourcecode of {fullpath}?"},
 										{"role": "assistant", "content": f"{code}"},
 									],
