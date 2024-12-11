@@ -5,8 +5,11 @@ from gdo.base.GDT import GDT
 from gdo.base.Logger import Logger
 from gdo.base.Message import Message
 from gdo.base.Method import Method
+from gdo.base.Render import Mode
 from gdo.chatgpt4o.GDO_ChappyMessage import GDO_ChappyMessage
+from gdo.core.GDO_Channel import GDO_Channel
 from gdo.core.GDO_Session import GDO_Session
+from gdo.core.GDO_User import GDO_User
 from gdo.core.GDT_Float import GDT_Float
 from gdo.core.GDT_RestOfText import GDT_RestOfText
 from gdo.core.GDT_UInt import GDT_UInt
@@ -77,6 +80,17 @@ class gpt(Method):
         messages = GDO_ChappyMessage.get_messages_for_user(message)
         return await self.send_to_chappy(message, messages)
 
+    async def send_wakeup_to_chappy(self, channel: GDO_Channel):
+        system = GDO_User.system()
+        msg = Message(f"", Mode.TXT).env_user(system).env_channel(channel).env_server(channel.get_server())
+        self.env_copy(msg)
+        GDO_ChappyMessage.blank({
+            'cm_sender': system.get_id(),
+            'cm_channel': channel.get_id(),
+            'cm_message': 'chappy: WakeUp call! Do not answer with $ack, but look back into the history to answer a question or improve the conversation. Maybe remember something important. If you have nothing to say, say you are bored.',
+        }).insert()
+        return await self.send_channel_to_chappy(msg)
+
     async def send_to_chappy(self, message: Message, messages: list):
         try:
             from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
@@ -87,21 +101,17 @@ class gpt(Method):
                 messages=messages,
                 temperature=self.cfg_temperature(message),
                 max_tokens=mod.cfg_max_tokens(),
-                # n=n,
-                # stop=stop,
-                # presence_penalty=presence_penalty,
-                # frequency_penalty=frequency_penalty,
             )
             self.__class__.PROCESSING = False
             text = response.choices[0].message.content
             text = self.trim_chappies_bad_response(text)
-            text = MDConvert(text).to(message._env_mode)
-            message.result(text)
             comrade = message._thread_user if message._thread_user else message._env_user
             message.comrade(comrade)
+            chappy_msg = self.generate_chappy_response(text, message)
+            text = MDConvert(text).to(message._env_mode)
+            message.result(text)
             await message.deliver(False, False)
-            # if text != self.__class__.LAST_RESPONSE:
-            Application.MESSAGES.put(self.generate_chappy_response(text, message))
+            Application.MESSAGES.put(chappy_msg)
         except Exception as ex:
             Logger.exception(ex)
         return self.empty()

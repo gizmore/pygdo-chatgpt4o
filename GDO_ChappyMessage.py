@@ -8,9 +8,11 @@ from gdo.chatgpt4o.GDO_ChappyBrain import GDO_ChappyBrain
 from gdo.core.GDO_Channel import GDO_Channel
 from gdo.core.GDO_User import GDO_User
 from gdo.core.GDT_AutoInc import GDT_AutoInc
+from gdo.core.GDT_Bool import GDT_Bool
 from gdo.core.GDT_Channel import GDT_Channel
 from gdo.core.GDT_Text import GDT_Text
 from gdo.core.GDT_User import GDT_User
+from gdo.core.GDT_UserType import GDT_UserType
 from gdo.date.GDT_Created import GDT_Created
 from gdo.date.GDT_Timestamp import GDT_Timestamp
 from gdo.date.Time import Time
@@ -26,6 +28,7 @@ class GDO_ChappyMessage(GDO):
             GDT_Channel('cm_channel'),
             GDT_Text('cm_message').not_null(),
             GDT_Timestamp('cm_sent'),
+            GDT_Timestamp('cm_training'),
             GDT_Created('cm_created'),
         ]
 
@@ -35,6 +38,18 @@ class GDO_ChappyMessage(GDO):
     def get_user(self) -> GDO_User:
         return self.gdo_value('cm_user')
 
+    def is_from_chappy(self) -> bool:
+        user = self.get_sender()
+        return user.is_type(GDT_UserType.CHAPPY)
+
+    def is_from_user(self) -> bool:
+        user = self.get_sender()
+        if user.is_type(GDT_UserType.SYSTEM):
+            return False
+        if user.is_type(GDT_UserType.CHAPPY):
+            return False
+        return True
+
     def get_channel(self) -> GDO_Channel | None:
         return self.gdo_value('cm_channel')
 
@@ -43,9 +58,9 @@ class GDO_ChappyMessage(GDO):
 
     def get_role(self):
         user = self.get_sender()
-        if user.is_type('system'):
+        if user.is_type(GDT_UserType.SYSTEM):
             return 'user'
-        if user == user.get_server().get_connector().gdo_get_dog_user():
+        if user.is_type(GDT_UserType.CHAPPY):
             return 'assistant'
         return 'user'
 
@@ -53,7 +68,7 @@ class GDO_ChappyMessage(GDO):
         timestamp = self.get_created().strftime('%Y%m%d%H%M%S')
         user = self.get_sender()
         chan = self.get_channel()
-        channel = chan.render_name()if chan is not None else ''
+        channel = chan.render_name() if chan is not None else ''
         sid = "{" + user.get_server_id() + "}"
         content = f"{timestamp}: {user.get_displayname()}{sid}{channel}: {self.gdo_val('cm_message')}"
         return content

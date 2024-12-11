@@ -26,8 +26,11 @@ class bash(Method):
             GDT_RestOfText('cmd').not_null(),
         ]
 
+    def get_command(self) -> str:
+        return self.param_value('cmd')
+
     async def gdo_execute(self):
-        cmd = self.param_value('cmd')
+        cmd = self.get_command().replace('"', '\\"')
         Logger.debug(cmd)
         process = await subprocess.create_subprocess_exec(
             "bash", "-c", f"cd ~ && {cmd}",
