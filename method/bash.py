@@ -30,7 +30,7 @@ class bash(Method):
         cmd = self.param_value('cmd')
         Logger.debug(cmd)
         process = await subprocess.create_subprocess_exec(
-            "sudo", "-u", "chappy", "bash", "-c", f"cd ~ && {cmd}",
+            "bash", "-c", f"cd ~ && {cmd}",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
