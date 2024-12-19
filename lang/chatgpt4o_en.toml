@@ -1,7 +1,54 @@
 module_chatgpt4o = "Chatgpt4o"
 
+#######
+# Ack #
+#######
+mt_chatgpt4o_ack = "ACK"
+md_chatgpt4o_ack = "This is for chappy only, acknowledging an interaction or conversation."
+
+########
+# Bash #
+########
 mt_chatgpt4o_bash = "Bash"
 md_chatgpt4o_bash = "Execute any bash command in the name of chappy."
 err_error = "Error: %s"
 msg_success = "The command returned success(0) but no output was generated."
 unknown_error = "Unknown error"
+
+##########
+# Forget #
+##########
+mt_chatgpt4o_forget = "forget"
+md_chatgpt4o_forget = "Remove an entry of your chappy brain memory."
+msg_gpt_forgot = "Chappy: You have forgotten about %s. Now go on!"
+
+##########
+# Forget #
+##########
+mt_chatgpt4o_goal = "Goal"
+md_chatgpt4o_goal = "Set the current goal for this user or channel thread."
+
+##########
+# Memory #
+##########
+mt_chatgpt4o_memory = "Memory"
+md_chatgpt4o_memory = "Inspect chappy's current dynamic $remember memory."
+msg_gpt_memory_keys = "We know of the current memory keys: %s."
+msg_gpt_memory_key = "Memory for key %s: %s"
+msg_gpt_full_memory = "Full Memory: %s"
+
+############
+# Remember #
+############
+mt_chatgpt4o_remember = "Remember"
+md_chatgpt4o_remember = "Remember important things in your dynamic genome memory chappy."
+msg_remembered = "You now remember %s: %s"
+
+########
+# Tune #
+########
+mt_chatgpt4o_tune = "GPT.Tune"
+md_chatgpt4o_tune = "Create jsonl files to be used for fine-tuning your chappy GPT model."
+msg_training_file_generated = "%s message blocks written to %s. Filtered: %s too long, %s too short, %s non final chappy, %s forbidden bytes"
+msg_pygdo_src_training = "You would train %s number of files. Total Size: %s"
+msg_source_training_file_generated = "Saved %s sourcefiles at %s."

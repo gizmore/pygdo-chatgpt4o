@@ -4,6 +4,7 @@ from pprint import pprint
 
 import httplib2
 
+from gdo.base.GDT import GDT
 from gdo.base.Method import Method
 from gdo.date.Time import Time
 
@@ -13,7 +14,7 @@ class funds(Method):
     def gdo_trigger(self) -> str:
         return 'funds'
 
-    def gdo_execute(self):
+    def gdo_execute(self) -> GDT:
         from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
         api_key = module_chatgpt4o.instance().cfg_api_key()
         http = httplib2.Http()

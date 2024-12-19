@@ -13,11 +13,17 @@ class GDO_ChappyBrain(GDO):
     def gdo_columns(self) -> list[GDT]:
         return [
             GDT_AutoInc('cb_id'),
-            GDT_Name('cb_key').unique().ascii().maxlen(32).not_null(),
-            GDT_String('cb_value').maxlen(256).not_null(),
+            GDT_Name('cb_key').unique().ascii().maxlen(48).not_null(),
+            GDT_String('cb_value').maxlen(512).not_null(),
             GDT_Deleted('cb_deleted'),
             GDT_Created('cb_created'),
         ]
+
+    def get_mem_key(self) -> str:
+        return self.gdo_value('cb_key')
+
+    def get_mem_value(self) -> str:
+        return self.gdo_value('cb_value')
 
     @classmethod
     def get_content(cls) -> str:

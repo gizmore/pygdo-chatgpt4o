@@ -4,6 +4,7 @@ from gdo.base.Application import Application
 from gdo.base.GDO import GDO
 from gdo.base.GDT import GDT
 from gdo.base.Message import Message
+from gdo.base.Util import Strings, Arrays
 from gdo.chatgpt4o.GDO_ChappyBrain import GDO_ChappyBrain
 from gdo.core.GDO_Channel import GDO_Channel
 from gdo.core.GDO_User import GDO_User
@@ -72,6 +73,16 @@ class GDO_ChappyMessage(GDO):
         sid = "{" + user.get_server_id() + "}"
         content = f"{timestamp}: {user.get_displayname()}{sid}{channel}: {self.gdo_val('cm_message')}"
         return content
+
+    @classmethod
+    def users_joined(cls, channel: GDO_Channel, users: list[GDO_User]):
+        cls.blank({
+            'cm_sender': GDO_User.system().get_id(),
+            'cm_user': None,
+            'cm_channel': channel.get_id(),
+            'cm_message': f"The following users joined the {channel.render_name()} channel: {Arrays.human_join([user.get_displayname() for user in users])}",
+            'cm_sent': Time.get_date(),
+        }).insert()
 
     @classmethod
     def incoming(cls, message: Message):

@@ -1,4 +1,6 @@
+from gdo.base.GDT import GDT
 from gdo.base.Method import Method
+from gdo.core.GDT_UserType import GDT_UserType
 
 
 class ack(Method):
@@ -6,9 +8,8 @@ class ack(Method):
     def gdo_trigger(self) -> str:
         return 'ack'
 
-    # def gdo_user_permission(self) -> str | None:
-    #     from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
-    #     return module_chatgpt4o.PERM_CHAPPY_BOT
+    def gdo_user_type(self) -> str | None:
+        return GDT_UserType.CHAPPY
 
-    def gdo_execute(self):
+    def gdo_execute(self) -> GDT:
         return self.empty()

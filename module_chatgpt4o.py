@@ -54,9 +54,11 @@ class module_chatgpt4o(GDO_Module):
             GDT_Secret('gpt4_api_key').initial(apikey),
             GDT_User('gpt4_chappy'),
             GDT_Text('gpt4_genome').initial(genome),
-            # GDT_String('gpt4_model').not_null().initial('ft:gpt-4o-mini-2024-07-18:personal:pygdo:Ad6xoYor'),  # gpt-4o
-            GDT_String('gpt4_model').not_null().initial('gpt-4o-mini'),  # gpt-4o
+            # GDT_String('gpt4_model').not_null().initial('gpt-4o-mini'),  # gpt-4o
             # GDT_String('gpt4_model').not_null().initial('gpt-4o'),  # gpt-4o
+            # GDT_String('gpt4_model').not_null().initial('ft:gpt-4o-2024-08-06:personal:chappy:Ae1HhgnK'),  # gpt-4o-ft
+            GDT_String('gpt4_model').not_null().initial('ft:gpt-4o-2024-08-06:personal:source:Ae9lSf9i'),   # chappy + sourcecode 1 epoch
+
             GDT_Int('gpt4_max_tokens').min(32).max(8192).initial(512),
             GDT_String('gpt4_linux_user').initial('chappy'),
         ]
@@ -109,19 +111,32 @@ class module_chatgpt4o(GDO_Module):
     def gdo_subscribe_events(self):
         Application.EVENTS.subscribe('new_message', self.on_new_message)
         Application.EVENTS.subscribe('msg_sent', self.on_message_sent)
-        Application.EVENTS.add_timer(Time.ONE_MINUTE*6, self.on_chappy_timer, 1000000000)
+        Application.EVENTS.subscribe('user_list', self.on_got_users)
+        # Application.EVENTS.add_timer(Time.ONE_MINUTE*20, self.on_chappy_timer, 1000000000)
 
     ##########
     # Events #
     ##########
 
     async def on_new_message(self, message: Message):
-        GDO_ChappyMessage.incoming(message)
-        dog = self.cfg_chappy().get_displayname().lower()
-        chappy = message._env_server.get_connector().gdo_get_dog_user().get_name().lower()
-        text = message._message.lower().rstrip("!?.{0123456789}\x00\x01\x02\x03").lstrip('@!')
-        if text.startswith(chappy) or text.startswith('chap') or text.endswith(chappy) or text.startswith(dog) or text.endswith(dog):
-            if not gpt.PROCESSING:
+        if message._message:
+            GDO_ChappyMessage.incoming(message)
+            dog = self.cfg_chappy().get_displayname().lower()
+            chappy = message._env_server.get_connector().gdo_get_dog_user().get_name().lower()
+            text = message._message.lower().rstrip("!?.{0123456789}\x00\x01\x02\x03").lstrip('@!')
+            if text.startswith(chappy) or text.startswith('chap') or text.endswith(chappy) or text.startswith(dog) or text.endswith(dog):
+                if not gpt.PROCESSING:
+                    gpt.PROCESSING = True
+                    try:
+                        await gpt().env_copy(message).send_message_to_chappy(message)
+                    except Exception as ex:
+                        gpt.PROCESSING = False
+                        raise ex
+
+    async def on_message_sent(self, message: Message):
+        if message._message:
+            GDO_ChappyMessage.outgoing(message)
+            if message._thread_user and not gpt.PROCESSING:
                 gpt.PROCESSING = True
                 try:
                     await gpt().env_copy(message).send_message_to_chappy(message)
@@ -129,15 +144,8 @@ class module_chatgpt4o(GDO_Module):
                     gpt.PROCESSING = False
                     raise ex
 
-    async def on_message_sent(self, message: Message):
-        GDO_ChappyMessage.outgoing(message)
-        if message._thread_user and not gpt.PROCESSING:
-            gpt.PROCESSING = True
-            try:
-                await gpt().env_copy(message).send_message_to_chappy(message)
-            except Exception as ex:
-                gpt.PROCESSING = False
-                raise ex
+    async def on_got_users(self, channel: GDO_Channel, users: list[GDO_User]):
+        GDO_ChappyMessage.users_joined(channel, users)
 
     async def on_chappy_timer(self):
         channel = GDO_ChappyMessage.table().select('DISTINCT(cm_channel_t.chan_id), cm_channel_t.*').join_object('cm_channel').join_object('cm_sender').fetch_as(GDO_Channel.table()).where('cm_sender_t.user_type="chappy"').order('RAND()').first().exec().fetch_object()

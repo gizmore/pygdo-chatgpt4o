@@ -1,4 +1,7 @@
+import asyncio
 import re
+
+from openai import InternalServerError, RateLimitError
 
 from gdo.base.Application import Application
 from gdo.base.GDT import GDT
@@ -28,7 +31,7 @@ class gpt(Method):
     def gdo_default_enabled(self) -> bool:
         return False
 
-    def gdo_parameters(self) -> [GDT]:
+    def gdo_parameters(self) -> list[GDT]:
         return [
             GDT_RestOfText('message').not_null(),
         ]
@@ -57,7 +60,7 @@ class gpt(Method):
         else:
             return self.get_config_user_value('window_size')
 
-    async def gdo_execute(self):
+    async def gdo_execute(self) -> GDT:
         text = self.param_value('message')
         msg = Message(text, self._env_mode).env_copy(self)
         GDO_ChappyMessage.incoming(msg)
@@ -111,7 +114,13 @@ class gpt(Method):
             text = MDConvert(text).to(message._env_mode)
             message.result(text)
             await message.deliver(False, False)
+            await asyncio.sleep(0.3141)
             Application.MESSAGES.put(chappy_msg)
+        except RateLimitError as ex:
+            message.result("Not enough money!")
+            await message.deliver(False, False)
+        except InternalServerError as ex:
+            raise ex
         except Exception as ex:
             Logger.exception(ex)
         return self.empty()

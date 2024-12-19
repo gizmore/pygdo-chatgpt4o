@@ -14,7 +14,7 @@ class goal(Method):
     def gdo_user_permission(self) -> str | None:
         return GDO_Permission.STAFF
 
-    def gdo_parameters(self) -> [GDT]:
+    def gdo_parameters(self) -> list[GDT]:
         return [
             GDT_RestOfText('goal').not_null(),
         ]
@@ -35,7 +35,7 @@ class goal(Method):
         else:
             return self.get_config_user_val('goal')
 
-    def gdo_execute(self):
+    def gdo_execute(self) -> GDT:
         the_goal = self.param_value('goal')
         if self._env_channel:
             self.save_config_channel('goal', the_goal)

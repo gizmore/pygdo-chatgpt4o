@@ -21,7 +21,7 @@ class bash(Method):
     def gdo_user_permission(self) -> str | None:
         return GDO_Permission.ADMIN
 
-    def gdo_parameters(self) -> [GDT]:
+    def gdo_parameters(self) -> list[GDT]:
         return [
             GDT_RestOfText('cmd').not_null(),
         ]
@@ -29,8 +29,8 @@ class bash(Method):
     def get_command(self) -> str:
         return self.param_value('cmd')
 
-    async def gdo_execute(self):
-        cmd = self.get_command().replace('"', '\\"')
+    async def gdo_execute(self) -> GDT:
+        cmd = self.get_command()  #.replace('"', '\\"')
         Logger.debug(cmd)
         process = await subprocess.create_subprocess_exec(
             "timeout", "10s", "bash", "-c", f"cd ~ && {cmd}",
