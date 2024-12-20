@@ -48,22 +48,22 @@ class gpt(Method):
             GDT_UInt('window_size').min(0).max(100).initial("50"),
         ]
 
-    def cfg_temperature(self, message: Message) -> float:
+    async def cfg_temperature(self, message: Message) -> float:
         if message._env_channel:
-            return self.get_config_channel_value('temperature')
+            return await self.get_config_channel_value('temperature')
         else:
-            return self.get_config_user_value('temperature')
+            return await self.get_config_user_value('temperature')
 
-    def cfg_window_size(self, message: Message) -> int:
+    async def cfg_window_size(self, message: Message) -> int:
         if message._env_channel:
-            return self.get_config_channel_value('window_size')
+            return await self.get_config_channel_value('window_size')
         else:
-            return self.get_config_user_value('window_size')
+            return await self.get_config_user_value('window_size')
 
     async def gdo_execute(self) -> GDT:
-        text = self.param_value('message')
+        text = await self.param_value('message')
         msg = Message(text, self._env_mode).env_copy(self)
-        GDO_ChappyMessage.incoming(msg)
+        await GDO_ChappyMessage.incoming(msg)
         if self._env_channel:
             return await self.send_channel_to_chappy(msg)
         else:

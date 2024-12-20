@@ -14,7 +14,7 @@ class funds(Method):
     def gdo_trigger(self) -> str:
         return 'funds'
 
-    def gdo_execute(self) -> GDT:
+    async def gdo_execute(self) -> GDT:
         from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
         api_key = module_chatgpt4o.instance().cfg_api_key()
         http = httplib2.Http()

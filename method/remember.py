@@ -21,7 +21,7 @@ class remember(Method):
             GDT_RestOfText('value').not_null(),
         ]
 
-    def gdo_execute(self) -> GDT:
+    async def gdo_execute(self) -> GDT:
         key = self.param_val('key')
         value = self.param_value('value')
         GDO_ChappyBrain.table().blank({

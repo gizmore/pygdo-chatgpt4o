@@ -35,7 +35,7 @@ class tune(Method):
 			GDT_String('model').not_null().initial('gpt-4o'),  # gpt-4o-mini | ft:gpt-4o-2024-08-06:personal:chappy:Ae1HhgnK | gpt-4o
 		]
 
-	def gdo_execute(self) -> GDT:
+	async def gdo_execute(self) -> GDT:
 		if level := self.param_value('pygdo'):
 			return self.train_pygdo(level)
 		else:

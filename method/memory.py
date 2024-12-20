@@ -21,7 +21,7 @@ class memory(Method):
     def get_key(self) -> str:
         return self.param_value('key')
 
-    def gdo_execute(self) -> GDT:
+    async def gdo_execute(self) -> GDT:
         if self.param_value('all'):
             return self.show_all_memory()
         elif key := self.get_key():

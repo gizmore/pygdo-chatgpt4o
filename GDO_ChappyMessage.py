@@ -33,29 +33,29 @@ class GDO_ChappyMessage(GDO):
             GDT_Created('cm_created'),
         ]
 
-    def get_sender(self) -> GDO_User:
-        return self.gdo_value('cm_sender')
+    async def get_sender(self) -> GDO_User:
+        return await self.gdo_value('cm_sender')
 
-    def get_user(self) -> GDO_User:
-        return self.gdo_value('cm_user')
+    async def get_user(self) -> GDO_User:
+        return await self.gdo_value('cm_user')
 
-    def is_from_chappy(self) -> bool:
-        user = self.get_sender()
+    async def is_from_chappy(self) -> bool:
+        user = await self.get_sender()
         return user.is_type(GDT_UserType.CHAPPY)
 
-    def is_from_user(self) -> bool:
-        user = self.get_sender()
+    async def is_from_user(self) -> bool:
+        user = await self.get_sender()
         if user.is_type(GDT_UserType.SYSTEM):
             return False
         if user.is_type(GDT_UserType.CHAPPY):
             return False
         return True
 
-    def get_channel(self) -> GDO_Channel | None:
-        return self.gdo_value('cm_channel')
+    async def get_channel(self) -> GDO_Channel | None:
+        return await self.gdo_value('cm_channel')
 
-    def get_created(self) -> datetime:
-        return self.gdo_value('cm_created')
+    async def get_created(self) -> datetime:
+        return await self.gdo_value('cm_created')
 
     def get_role(self):
         user = self.get_sender()
@@ -65,19 +65,19 @@ class GDO_ChappyMessage(GDO):
             return 'assistant'
         return 'user'
 
-    def get_gpt_content(self):
-        timestamp = self.get_created().strftime('%Y%m%d%H%M%S')
-        user = self.get_sender()
-        chan = self.get_channel()
+    async def get_gpt_content(self):
+        timestamp = (await self.get_created()).strftime('%Y%m%d%H%M%S')
+        user = await self.get_sender()
+        chan = await self.get_channel()
         channel = chan.render_name() if chan is not None else ''
         sid = "{" + user.get_server_id() + "}"
         content = f"{timestamp}: {user.get_displayname()}{sid}{channel}: {self.gdo_val('cm_message')}"
         return content
 
     @classmethod
-    def users_joined(cls, channel: GDO_Channel, users: list[GDO_User]):
-        cls.blank({
-            'cm_sender': GDO_User.system().get_id(),
+    async def users_joined(cls, channel: GDO_Channel, users: list[GDO_User]):
+        await cls.blank({
+            'cm_sender': await GDO_User.system_id(),
             'cm_user': None,
             'cm_channel': channel.get_id(),
             'cm_message': f"The following users joined the {channel.render_name()} channel: {Arrays.human_join([user.get_displayname() for user in users])}",
@@ -85,13 +85,14 @@ class GDO_ChappyMessage(GDO):
         }).insert()
 
     @classmethod
-    def incoming(cls, message: Message):
-        mark_sent = message._env_user == message._env_server.get_connector().gdo_get_dog_user()
+    async def incoming(cls, message: Message):
+        conn = await message._env_server.get_connector()
+        mark_sent = message._env_user == await conn.gdo_get_dog_user()
         user = None
         if not message._env_channel:
             user = message._thread_user if message._thread_user else message._env_user
             user = user.get_id()
-        cls.blank({
+        await cls.blank({
             'cm_sender': message._env_user.get_id(),
             'cm_user': user,
             'cm_channel': message._env_channel.get_id() if message._env_channel else None,
@@ -100,11 +101,11 @@ class GDO_ChappyMessage(GDO):
         }).insert()
 
     @classmethod
-    def outgoing(cls, message: Message, mark_sent: bool = False):
+    async def outgoing(cls, message: Message, mark_sent: bool = False):
         user = None
         if not message._env_channel:
             user = message._thread_user.get_id() if message._thread_user else message._env_user.get_id()
-        cls.blank({
+        await cls.blank({
             'cm_sender': GDO_User.system().get_id(),
             'cm_user': user,
             'cm_channel': message._env_channel.get_id() if message._env_channel else None,
@@ -119,11 +120,11 @@ class GDO_ChappyMessage(GDO):
         mod = module_chatgpt4o.instance()
         role = 'user' if mod.cfg_model().startswith('o1') else 'system'
         content = mod.cfg_genome()
-        the_goal = goal().env_copy(message).cfg_goal()
-        content += f"Your current goal here is: {the_goal}\n"
-        content += f"You can control the following content with $remember and $forget:\n"
+        content += f"Chappy, you can control the following content with $remember and $forget:\n"
         content += GDO_ChappyBrain.get_content()
         content += "\n"
+        the_goal = goal().env_copy(message).cfg_goal()
+        content += f"Chappy, Your current goal here is: {the_goal}\n"
         return {"role": role, "content": content}
 
     @classmethod
