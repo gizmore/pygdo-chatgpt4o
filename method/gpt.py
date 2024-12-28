@@ -110,10 +110,10 @@ class gpt(Method):
             text = self.trim_chappies_bad_response(text)
             comrade = message._thread_user if message._thread_user else message._env_user
             message.comrade(comrade)
-            self.generate_chappy_response(text, message)
             text = MDConvert(text).to(message._env_mode)
             message.result(text)
             await message.deliver(False, False)
+            self.generate_chappy_response(text, message)
             await asyncio.sleep(0.3141)
         except RateLimitError as ex:
             message.result("Not enough money!")
