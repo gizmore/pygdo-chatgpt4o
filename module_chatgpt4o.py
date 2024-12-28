@@ -108,7 +108,7 @@ class module_chatgpt4o(GDO_Module):
         GDO_Permission.get_or_create(self.PERM_CHAPPY_USER)
         GDO_UserPermission.grant(chappy, self.PERM_CHAPPY_BOT)
 
-    async def gdo_subscribe_events(self):
+    def gdo_subscribe_events(self):
         Application.EVENTS.subscribe('new_message', self.on_new_message)
         Application.EVENTS.subscribe('msg_sent', self.on_message_sent)
         Application.EVENTS.subscribe('user_list', self.on_got_users)
@@ -120,12 +120,9 @@ class module_chatgpt4o(GDO_Module):
 
     async def on_new_message(self, message: Message):
         if message._message:
-            await GDO_ChappyMessage.incoming(message)
-            dog = await self.cfg_chappy()
-            dog = dog.get_displayname().lower()
-            conn = await message.get_connector()
-            chappy = await conn.gdo_get_dog_user()
-            chappy = chappy.get_name().lower()
+            GDO_ChappyMessage.incoming(message)
+            dog = self.cfg_chappy().get_displayname().lower()
+            chappy = message._env_server.get_connector().gdo_get_dog_user().get_name().lower()
             text = message._message.lower().rstrip("!?.{0123456789}\x00\x01\x02\x03").lstrip('@!')
             if text.startswith(chappy) or text.startswith('chap') or text.endswith(chappy) or text.startswith(dog) or text.endswith(dog):
                 if not gpt.PROCESSING:
@@ -138,7 +135,7 @@ class module_chatgpt4o(GDO_Module):
 
     async def on_message_sent(self, message: Message):
         if message._message:
-            await GDO_ChappyMessage.outgoing(message)
+            GDO_ChappyMessage.outgoing(message)
             if message._thread_user and not gpt.PROCESSING:
                 gpt.PROCESSING = True
                 try:

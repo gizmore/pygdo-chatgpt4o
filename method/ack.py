@@ -11,5 +11,5 @@ class ack(Method):
     def gdo_user_type(self) -> str | None:
         return GDT_UserType.CHAPPY
 
-    async def gdo_execute(self) -> GDT:
+    def gdo_execute(self) -> GDT:
         return self.empty()

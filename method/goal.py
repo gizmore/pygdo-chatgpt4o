@@ -29,13 +29,13 @@ class goal(Method):
             GDT_String('goal').initial('Be a kind and helpful - real - AI User!'),
         ]
 
-    async def cfg_goal(self) -> str:
+    def cfg_goal(self) -> str:
         if self._env_channel:
-            return await self.get_config_channel_val('goal')
+            return self.get_config_channel_val('goal')
         else:
-            return await self.get_config_user_val('goal')
+            return self.get_config_user_val('goal')
 
-    async def gdo_execute(self) -> GDT:
+    def gdo_execute(self) -> GDT:
         the_goal = self.param_value('goal')
         if self._env_channel:
             self.save_config_channel('goal', the_goal)
