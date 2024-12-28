@@ -110,12 +110,11 @@ class gpt(Method):
             text = self.trim_chappies_bad_response(text)
             comrade = message._thread_user if message._thread_user else message._env_user
             message.comrade(comrade)
-            chappy_msg = self.generate_chappy_response(text, message)
+            self.generate_chappy_response(text, message)
             text = MDConvert(text).to(message._env_mode)
             message.result(text)
             await message.deliver(False, False)
             await asyncio.sleep(0.3141)
-            Application.MESSAGES.put(chappy_msg)
         except RateLimitError as ex:
             message.result("Not enough money!")
             await message.deliver(False, False)
@@ -125,10 +124,11 @@ class gpt(Method):
             Logger.exception(ex)
         return self.empty()
 
-    def generate_chappy_response(self, text: str, msg: Message) -> Message:
+    def generate_chappy_response(self, text: str, msg: Message):
         chappy = msg._env_server.get_connector().gdo_get_dog_user()
-        new = msg.message_copy().env_user(chappy).env_session(GDO_Session.for_user(chappy)).message(text).result(None)
-        return new
+        for line in text.split("\n"):
+            new = msg.message_copy().env_user(chappy).env_session(GDO_Session.for_user(chappy)).message(line).result(None)
+            Application.MESSAGES.put(new)
 
     def trim_chappies_bad_response(self, text: str) -> str:
         pattern = r'^\d{14}: '
