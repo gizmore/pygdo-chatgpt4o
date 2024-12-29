@@ -125,7 +125,7 @@ class module_chatgpt4o(GDO_Module):
             GDO_ChappyMessage.incoming(message)
             dog = self.cfg_chappy().get_displayname().lower()
             chappy = message._env_server.get_connector().gdo_get_dog_user().get_name().lower()
-            text = message._message.lower().rstrip("!?.{0123456789}\x00\x01\x02\x03").lstrip('@!')
+            text = message._message.lower().rstrip("!?,.{0123456789}\x00\x01\x02\x03").lstrip('$@!.?,')
             if text.startswith(chappy) or text.startswith('chap') or text.endswith(chappy) or text.startswith(dog) or text.endswith(dog):
                 if not gpt.PROCESSING:
                     gpt.PROCESSING = True
