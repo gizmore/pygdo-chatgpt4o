@@ -113,8 +113,8 @@ class gpt(Method):
             text = MDConvert(text).to(message._env_mode)
             message.result(text)
             await message.deliver(False, False)
-            self.generate_chappy_response(text, message)
             await asyncio.sleep(0.3141)
+            self.generate_chappy_response(text, message)
         except RateLimitError as ex:
             message.result("Not enough money!")
             await message.deliver(False, False)
