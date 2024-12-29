@@ -76,11 +76,16 @@ class GDO_ChappyMessage(GDO):
 
     @classmethod
     def users_joined(cls, channel: GDO_Channel, users: list[GDO_User]):
+        if channel is None:
+            return
+            # message_text = f"The user(s) {Arrays.human_join([user.get_displayname() for user in users])} joined the server."
+        else:
+            message_text = f"The following users joined the {channel.render_name()} channel: {Arrays.human_join([user.get_displayname() for user in users])}"
         cls.blank({
             'cm_sender': GDO_User.system().get_id(),
             'cm_user': None,
             'cm_channel': channel.get_id(),
-            'cm_message': f"The following users joined the {channel.render_name()} channel: {Arrays.human_join([user.get_displayname() for user in users])}",
+            'cm_message': message_text,
             'cm_sent': Time.get_date(),
         }).insert()
 

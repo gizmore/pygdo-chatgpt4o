@@ -112,6 +112,8 @@ class module_chatgpt4o(GDO_Module):
         Application.EVENTS.subscribe('new_message', self.on_new_message)
         Application.EVENTS.subscribe('msg_sent', self.on_message_sent)
         Application.EVENTS.subscribe('user_list', self.on_got_users)
+        Application.EVENTS.subscribe('user_joined_channel', self.on_user_joined_channel)
+        Application.EVENTS.subscribe('user_joined_server', self.on_user_joined_server)
         # Application.EVENTS.add_timer(Time.ONE_MINUTE*20, self.on_chappy_timer, 1000000000)
 
     ##########
@@ -157,6 +159,12 @@ class module_chatgpt4o(GDO_Module):
                 except Exception as ex:
                     gpt.PROCESSING = False
                     raise ex
+
+    async def on_user_joined_channel(self, user: GDO_User, channel: GDO_Channel):
+        GDO_ChappyMessage.users_joined(channel, [user])
+
+    async def on_user_joined_server(self, user: GDO_User):
+        GDO_ChappyMessage.users_joined(None, [user])
 
     #######
     # API #
