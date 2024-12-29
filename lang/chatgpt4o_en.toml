@@ -15,6 +15,14 @@ err_error = "Error: %s"
 msg_success = "The command returned success(0) but no output was generated."
 unknown_error = "Unknown error"
 
+############
+# Remember #
+############
+mt_chatgpt4o_remember = "Remember"
+md_chatgpt4o_remember = "Let's chappy put a row in his initial genome system prompt."
+msg_remember_override = "You changed your memory for '%s' from %s to %s."
+msg_remembered = "You now remember %s: %s."
+
 ##########
 # Forget #
 ##########
@@ -23,7 +31,7 @@ md_chatgpt4o_forget = "Remove an entry of your chappy brain memory."
 msg_gpt_forgot = "Chappy: You have forgotten about %s. Now go on!"
 
 ##########
-# Forget #
+# GoaL #
 ##########
 mt_chatgpt4o_goal = "Goal"
 md_chatgpt4o_goal = "Set the current goal for this user or channel thread."
@@ -36,13 +44,6 @@ md_chatgpt4o_memory = "Inspect chappy's current dynamic $remember memory."
 msg_gpt_memory_keys = "We know of the current memory keys: %s."
 msg_gpt_memory_key = "Memory for key %s: %s"
 msg_gpt_full_memory = "Full Memory: %s"
-
-############
-# Remember #
-############
-mt_chatgpt4o_remember = "Remember"
-md_chatgpt4o_remember = "Remember important things in your dynamic genome memory chappy."
-msg_remembered = "You now remember %s: %s"
 
 ########
 # Tune #

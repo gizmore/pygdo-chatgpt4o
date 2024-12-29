@@ -1,3 +1,4 @@
+from gdo.base.GDO import GDO
 from gdo.base.GDT import GDT
 from gdo.base.Method import Method
 from gdo.base.Util import html
@@ -24,8 +25,13 @@ class remember(Method):
     def gdo_execute(self) -> GDT:
         key = self.param_val('key')
         value = self.param_value('value')
+        old = GDO_ChappyBrain.table().get_by('cb_key', key)
+        if old:
+            GDO_ChappyBrain.table().delete_where(f"cb_key={GDO.quote(key)}")
         GDO_ChappyBrain.table().blank({
             'cb_key': key,
             'cb_value': value,
         }).insert()
+        if old:
+            return self.reply('msg_remember_override', [key, html(old.gdo_val('cb_value')), html(value)])
         return self.reply('msg_remembered', [key, html(value)])
