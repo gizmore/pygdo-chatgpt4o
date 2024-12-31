@@ -35,6 +35,7 @@ msg_gpt_forgot = "Chappy: You have forgotten about %s. Now go on!"
 ##########
 mt_chatgpt4o_goal = "Goal"
 md_chatgpt4o_goal = "Set the current goal for this user or channel thread."
+msg_goal_saved = "The new goal is: %s"
 
 ##########
 # Memory #
