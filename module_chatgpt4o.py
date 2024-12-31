@@ -119,9 +119,14 @@ class module_chatgpt4o(GDO_Module):
     ##########
     # Events #
     ##########
+    def gpt_enabled(self, message: Message) -> bool:
+        if message._env_channel:
+            return not gpt().env_copy(message).get_config_channel_value('disabled')
+        else:
+            return not gpt().env_copy(message).get_config_server_value('disabled')
 
     async def on_new_message(self, message: Message):
-        if message._message:
+        if message._message and self.gpt_enabled(message):
             GDO_ChappyMessage.incoming(message)
             dog = self.cfg_chappy().get_displayname().lower()
             chappy = message._env_server.get_connector().gdo_get_dog_user().get_name().lower()
@@ -136,7 +141,7 @@ class module_chatgpt4o(GDO_Module):
                         raise ex
 
     async def on_message_sent(self, message: Message):
-        if message._message:
+        if message._message and self.gpt_enabled(message):
             GDO_ChappyMessage.outgoing(message)
             if message._thread_user and not gpt.PROCESSING:
                 gpt.PROCESSING = True
