@@ -38,10 +38,10 @@ class bash(Method):
             stderr=subprocess.PIPE
         )
         stdout, stderr = await process.communicate()
-        stdout_decoded = stdout.decode('utf-8').strip().splitlines()
-        stderr_decoded = stderr.decode('utf-8').strip().splitlines()
+        stdout_decoded = stdout.decode('utf-8').splitlines()
+        stderr_decoded = stderr.decode('utf-8').splitlines()
         Logger.debug(str(stderr_decoded))
         if process.returncode != 0:
             return self.err('err_error', [html('\n'.join(stderr_decoded)) or t('unknown_error')])
-        return self.reply('%s', [html('\n'.join(stdout_decoded)) or t("msg_success")])
+        return self.reply('%s', [html('\n'.join(stdout_decoded), self._env_mode) or t("msg_success")])
 

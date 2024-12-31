@@ -28,8 +28,8 @@ class gpt(Method):
     def gdo_trigger(self) -> str:
         return 'gpt'
 
-    def gdo_default_enabled(self) -> bool:
-        return False
+    # def gdo_default_enabled(self) -> bool:
+    #     return False
 
     def gdo_parameters(self) -> list[GDT]:
         return [
@@ -38,14 +38,14 @@ class gpt(Method):
 
     def gdo_method_config_user(self) -> [GDT]:
         return [
-            GDT_Float('temperature').min(0).max(0.5).initial("0.1"),
-            GDT_Float('window_size').min(0).max(50).initial("25"),
+            GDT_Float('temperature').min(0).max(0.5).initial("0.05"),
+            GDT_Float('window_size').min(0).max(50).initial("10"),
         ]
 
     def gdo_method_config_channel(self) -> [GDT]:
         return [
             GDT_Float('temperature').min(0).max(0.8).initial("0.1"),
-            GDT_UInt('window_size').min(0).max(100).initial("50"),
+            GDT_UInt('window_size').min(0).max(100).initial("20"),
         ]
 
     def cfg_temperature(self, message: Message) -> float:

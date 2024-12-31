@@ -4,6 +4,7 @@ from gdo.base.Application import Application
 from gdo.base.GDO import GDO
 from gdo.base.GDT import GDT
 from gdo.base.Message import Message
+from gdo.base.Render import Mode
 from gdo.base.Util import Strings, Arrays
 from gdo.chatgpt4o.GDO_ChappyBrain import GDO_ChappyBrain
 from gdo.core.GDO_Channel import GDO_Channel
@@ -113,7 +114,7 @@ class GDO_ChappyMessage(GDO):
             'cm_sender': GDO_User.system().get_id(),
             'cm_user': user,
             'cm_channel': message._env_channel.get_id() if message._env_channel else None,
-            'cm_message': message._result,
+            'cm_message': message._gdt_result.render(Mode.TXT),
             'cm_sent': Time.get_date() if mark_sent else None,
         }).insert()
 
