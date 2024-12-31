@@ -110,7 +110,7 @@ class gpt(Method):
             text = self.trim_chappies_bad_response(text)
             comrade = message._thread_user if message._thread_user else message._env_user
             message.comrade(comrade)
-            text = MDConvert(text).to(message._env_mode)
+            #text = MDConvert(text).to(message._env_mode)
             message.result(text)
             await message.deliver(False, False)
             await asyncio.sleep(0.3141)
