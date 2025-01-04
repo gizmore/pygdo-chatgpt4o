@@ -85,7 +85,7 @@ class gpt(Method):
 
     async def send_wakeup_to_chappy(self, channel: GDO_Channel):
         system = GDO_User.system()
-        msg = Message(f"", Mode.TXT).env_user(system).env_channel(channel).env_server(channel.get_server())
+        msg = Message(f"", Mode.TXT).env_user(system, True).env_channel(channel).env_server(channel.get_server())
         self.env_copy(msg)
         GDO_ChappyMessage.blank({
             'cm_sender': system.get_id(),
@@ -127,7 +127,7 @@ class gpt(Method):
     def generate_chappy_response(self, text: str, msg: Message):
         chappy = msg._env_server.get_connector().gdo_get_dog_user()
         for line in text.split("\n"):
-            new = msg.message_copy().env_user(chappy).env_session(GDO_Session.for_user(chappy)).message(line).result(None)
+            new = msg.message_copy().env_user(chappy, True).message(line).result(None)
             Application.MESSAGES.put(new)
 
     def trim_chappies_bad_response(self, text: str) -> str:
