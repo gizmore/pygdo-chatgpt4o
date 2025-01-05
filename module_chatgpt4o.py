@@ -1,8 +1,10 @@
 import functools
-from pyexpat.errors import messages
-
 import tomlkit
-from openai import OpenAI
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from openai import OpenAI
 
 from gdo.base.Application import Application
 from gdo.base.GDO_Module import GDO_Module
@@ -14,10 +16,8 @@ from gdo.chatgpt4o.GDO_ChappyBrain import GDO_ChappyBrain
 from gdo.chatgpt4o.method.gpt import gpt
 from gdo.core.GDO_Channel import GDO_Channel
 from gdo.core.GDO_Permission import GDO_Permission
-from gdo.core.GDO_Server import GDO_Server
 from gdo.core.GDO_User import GDO_User
 from gdo.core.GDO_UserPermission import GDO_UserPermission
-from gdo.core.GDT_Enum import GDT_Enum
 from gdo.core.GDT_Int import GDT_Int
 from gdo.core.GDT_Secret import GDT_Secret
 from gdo.core.GDT_String import GDT_String
@@ -25,7 +25,6 @@ from gdo.core.GDT_Text import GDT_Text
 from gdo.core.GDT_User import GDT_User
 from gdo.core.GDT_UserType import GDT_UserType
 from gdo.core.connector.Bash import Bash
-from gdo.date.Time import Time
 
 
 class module_chatgpt4o(GDO_Module):
@@ -175,6 +174,7 @@ class module_chatgpt4o(GDO_Module):
     # API #
     #######
     @functools.cache
-    def get_openai(self) -> OpenAI:
+    def get_openai(self) -> 'OpenAI':
+        from openai import OpenAI
         client = OpenAI(api_key=self.cfg_api_key())
         return client
