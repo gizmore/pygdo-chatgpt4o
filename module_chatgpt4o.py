@@ -32,6 +32,10 @@ class module_chatgpt4o(GDO_Module):
     PERM_CHAPPY_USER = 'chappy_user'
     PERM_CHAPPY_BOT = 'chappy_bot'
 
+    def __init__(self):
+        super().__init__()
+        self._priority = 80
+
     ##########
     # Config #
     ##########
