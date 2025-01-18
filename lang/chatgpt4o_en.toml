@@ -54,3 +54,8 @@ md_chatgpt4o_tune = "Create jsonl files to be used for fine-tuning your chappy G
 msg_training_file_generated = "%s message blocks written to %s. Filtered: %s too long, %s too short, %s non final chappy, %s forbidden bytes"
 msg_pygdo_src_training = "You would train %s number of files. Total Size: %s"
 msg_source_training_file_generated = "Saved %s sourcefiles at %s."
+
+########
+# Chat #
+########
+mt_chatgpt4o_chat = "Chat with Chappy"

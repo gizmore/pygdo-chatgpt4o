@@ -3,6 +3,9 @@ import tomlkit
 
 from typing import TYPE_CHECKING
 
+from gdo.ui.GDT_Link import GDT_Link
+from gdo.ui.GDT_Page import GDT_Page
+
 if TYPE_CHECKING:
     from openai import OpenAI
 
@@ -10,7 +13,7 @@ from gdo.base.Application import Application
 from gdo.base.GDO_Module import GDO_Module
 from gdo.base.GDT import GDT
 from gdo.base.Message import Message
-from gdo.base.Util import Files
+from gdo.base.Util import Files, href
 from gdo.chatgpt4o.GDO_ChappyMessage import GDO_ChappyMessage
 from gdo.chatgpt4o.GDO_ChappyBrain import GDO_ChappyBrain
 from gdo.chatgpt4o.method.gpt import gpt
@@ -97,6 +100,9 @@ class module_chatgpt4o(GDO_Module):
         return [
             'markdown',
         ]
+
+    def gdo_init_sidebar(self, page: 'GDT_Page'):
+        page._left_bar.add_field(GDT_Link().text('mt_chatgpt4o_chat').href(href('chatgpt4o', 'chat')))
 
     #############
     ### Hooks ###

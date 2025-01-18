@@ -10,10 +10,8 @@ class chat(MethodForm):
         return ''
 
     def gdo_create_form(self, form: GDT_Form) -> None:
-        form.add_field()
+        form.add_field(GDT_Message('text').not_null())
         super().gdo_create_form(form)
 
-    def gdo_create_form_parameters(self) -> [GDT]:
-        return [
-            GDT_Message('text').not_null()
-        ]
+    def form_submitted(self):
+        pass
