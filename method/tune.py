@@ -91,7 +91,7 @@ class tune(Method):
 				out.write(jsonl)
 				out.write('\n')
 				count += 1
-		return self.reply('msg_training_file_generated', [count, output_path, count_too_long, count_too_short, count_no_chappy, count_invalid_words])
+		return self.reply('msg_training_file_generated', (count, output_path, count_too_long, count_too_short, count_no_chappy, count_invalid_words))
 
 	def train_pygdo(self, level: int):
 		src_files = []
@@ -121,7 +121,7 @@ class tune(Method):
 			total_bytes = 0
 			for full_path in src_files:
 				total_bytes += os.path.getsize(full_path)
-			return self.reply('msg_pygdo_src_training', [len(src_files), Files.human_file_size(total_bytes)])
+			return self.reply('msg_pygdo_src_training', (len(src_files), Files.human_file_size(total_bytes)))
 		elif level >= 2:
 			now = False
 			with open(output_path, 'a') as out:
@@ -135,7 +135,7 @@ class tune(Method):
 							count += 1
 					else:
 						print(f'Skipping {full_path}')
-		return self.reply('msg_source_training_file_generated', [count, output_path])
+		return self.reply('msg_source_training_file_generated', (count, output_path))
 
 	def train_pygdo_file(self, full_path: str) -> object:
 		messages = []

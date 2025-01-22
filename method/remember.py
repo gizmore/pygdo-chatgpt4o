@@ -33,5 +33,5 @@ class remember(Method):
             'cb_value': value,
         }).insert()
         if old:
-            return self.reply('msg_remember_override', [key, html(old.gdo_val('cb_value')), html(value)])
-        return self.reply('msg_remembered', [key, html(value)])
+            return self.reply('msg_remember_override', (key, html(old.gdo_val('cb_value')), html(value)))
+        return self.reply('msg_remembered', (key, html(value)))

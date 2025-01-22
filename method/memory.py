@@ -37,15 +37,15 @@ class memory(Method):
         memories = query.exec()
         for memory in memories:
             out.append(f"{memory.get_mem_key()}: {html(memory.get_mem_value())}")
-        return self.reply('msg_gpt_full_memory', ["\n".join(out)])
+        return self.reply('msg_gpt_full_memory', ("\n".join(out),))
 
     def show_single_memory(self, key: str) -> GDT:
         value = GDO_ChappyBrain.table().get_by('cb_key', key).gdo_value('cb_value')
-        return self.reply('msg_gpt_memory_key', [key, html(value)])
+        return self.reply('msg_gpt_memory_key', (key, html(value)))
 
     def show_all_memory_keys(self) -> GDT:
         out = []
         memories = GDO_ChappyBrain.table().select('cb_key').exec().fetch_column()
         for memory in memories:
             out.append(memory)
-        return self.reply('msg_gpt_memory_keys', [", ".join(out)])
+        return self.reply('msg_gpt_memory_keys', (", ".join(out),))

@@ -41,4 +41,4 @@ class goal(Method):
             self.save_config_channel('goal', the_goal)
         else:
             self.save_config_user('goal', the_goal)
-        return self.reply('msg_goal_saved', [html(the_goal)])
+        return self.reply('msg_goal_saved', (html(the_goal),))

@@ -27,4 +27,4 @@ class funds(Method):
 
         amount = 0
 
-        return self.reply('msg_funds', [amount])
+        return self.reply('msg_funds', (amount,))

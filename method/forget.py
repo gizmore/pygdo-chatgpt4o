@@ -22,4 +22,4 @@ class forget(Method):
     def gdo_execute(self) -> GDT:
         key = self.param_val('key')
         GDO_ChappyBrain.table().delete_where(f'cb_key="{key}"')
-        return self.reply('msg_gpt_forgot', [key])
+        return self.reply('msg_gpt_forgot', (key,))
