@@ -28,21 +28,24 @@ class gpt(Method):
     def gdo_trigger(self) -> str:
         return 'gpt'
 
-    # def gdo_default_enabled(self) -> bool:
-    #     return False
+    @classmethod
+    def gdo_default_enabled(cls) -> bool:
+        return False
 
     def gdo_parameters(self) -> list[GDT]:
         return [
             GDT_RestOfText('message').not_null(),
         ]
 
-    def gdo_method_config_user(self) -> [GDT]:
+    @classmethod
+    def gdo_method_config_user(cls) -> [GDT]:
         return [
             GDT_Float('temperature').min(0).max(0.5).initial("0.05"),
             GDT_Float('window_size').min(0).max(50).initial("10"),
         ]
 
-    def gdo_method_config_channel(self) -> [GDT]:
+    @classmethod
+    def gdo_method_config_channel(cls) -> [GDT]:
         return [
             GDT_Float('temperature').min(0).max(0.8).initial("0.1"),
             GDT_UInt('window_size').min(0).max(100).initial("20"),

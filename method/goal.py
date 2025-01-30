@@ -19,12 +19,14 @@ class goal(Method):
             GDT_RestOfText('goal').not_null(),
         ]
 
-    def gdo_method_config_user(self) -> [GDT]:
+    @classmethod
+    def gdo_method_config_user(cls) -> [GDT]:
         return [
             GDT_String('goal').initial('Be a kind and helpful - real - AI User!'),
         ]
 
-    def gdo_method_config_channel(self) -> [GDT]:
+    @classmethod
+    def gdo_method_config_channel(cls) -> [GDT]:
         return [
             GDT_String('goal').initial('Be a kind and helpful - real - AI User!'),
         ]
