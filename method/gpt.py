@@ -1,8 +1,6 @@
 import asyncio
 import re
 
-from openai import InternalServerError, RateLimitError
-
 from gdo.base.Application import Application
 from gdo.base.GDT import GDT
 from gdo.base.Logger import Logger
@@ -11,12 +9,10 @@ from gdo.base.Method import Method
 from gdo.base.Render import Mode
 from gdo.chatgpt4o.GDO_ChappyMessage import GDO_ChappyMessage
 from gdo.core.GDO_Channel import GDO_Channel
-from gdo.core.GDO_Session import GDO_Session
 from gdo.core.GDO_User import GDO_User
 from gdo.core.GDT_Float import GDT_Float
 from gdo.core.GDT_RestOfText import GDT_RestOfText
 from gdo.core.GDT_UInt import GDT_UInt
-from gdo.markdown.MDConvert import MDConvert
 
 
 class gpt(Method):
@@ -99,6 +95,7 @@ class gpt(Method):
 
     async def send_to_chappy(self, message: Message, messages: list):
         try:
+            from openai import InternalServerError, RateLimitError
             from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
             mod = module_chatgpt4o.instance()
             api = mod.get_openai()

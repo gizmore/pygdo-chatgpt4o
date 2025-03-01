@@ -1,4 +1,6 @@
 import functools
+import os
+
 import tomlkit
 
 from typing import TYPE_CHECKING
@@ -185,6 +187,7 @@ class module_chatgpt4o(GDO_Module):
     #######
     @functools.cache
     def get_openai(self) -> 'OpenAI':
+        os.environ['OPENAI_API_KEY'] = api_key = self.cfg_api_key()
         from openai import OpenAI
-        client = OpenAI(api_key=self.cfg_api_key())
+        client = OpenAI(api_key=api_key)
         return client
