@@ -25,7 +25,7 @@ class gpt(Method):
         return 'gpt'
 
     @classmethod
-    def gdo_default_enabled(cls) -> bool:
+    def gdo_default_enabled_channel(cls) -> bool:
         return False
 
     def gdo_parameters(self) -> list[GDT]:
