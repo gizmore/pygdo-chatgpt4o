@@ -94,6 +94,14 @@ class gpt(Method):
         return await self.send_channel_to_chappy(msg)
 
     async def send_to_chappy(self, message: Message, messages: list):
+        from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
+        mod = module_chatgpt4o.instance()
+        if mod.cfg_mode() == 'api':
+            await self.send_to_chappy_api(message, messages)
+        else:
+            await self.send_to_chappy_web(message, messages)
+
+    async def send_to_chappy_api(self, message: Message, messages: list):
         try:
             from openai import InternalServerError, RateLimitError
             from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
@@ -138,3 +146,6 @@ class gpt(Method):
         pattern = r'^' + chappy_name + r'[^:]*: '
         text = re.sub(pattern, '', text)
         return text
+
+    async def send_to_chappy_web(self, message: Message, messages: list):
+        pass

@@ -5,6 +5,7 @@ import tomlkit
 
 from typing import TYPE_CHECKING
 
+from gdo.core.GDT_Enum import GDT_Enum
 from gdo.ui.GDT_Link import GDT_Link
 from gdo.ui.GDT_Page import GDT_Page
 
@@ -69,6 +70,7 @@ class module_chatgpt4o(GDO_Module):
 
             GDT_Int('gpt4_max_tokens').min(32).max(8192).initial(512),
             GDT_String('gpt4_linux_user').initial('chappy'),
+            GDT_Enum('gpt4_mode').choices({'api': 'API', 'web': 'Web'})
         ]
 
     def cfg_api_key(self) -> str:
@@ -88,6 +90,9 @@ class module_chatgpt4o(GDO_Module):
 
     def cfg_linux_user(self) -> str:
         return self.get_config_val('gpt4_linux_user')
+
+    def cfg_mode(self) -> str:
+        return self.get_config_val('gpt4_mode')
 
     ##########
     # Module #
