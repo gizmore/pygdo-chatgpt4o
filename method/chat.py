@@ -6,7 +6,8 @@ from gdo.message.GDT_Message import GDT_Message
 
 class chat(MethodForm):
 
-    def gdo_trigger(self) -> str:
+    @classmethod
+    def gdo_trigger(cls) -> str:
         return ''
 
     def gdo_create_form(self, form: GDT_Form) -> None:

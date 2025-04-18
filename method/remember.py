@@ -10,7 +10,8 @@ from gdo.core.GDT_UserType import GDT_UserType
 
 class remember(Method):
 
-    def gdo_trigger(self) -> str:
+    @classmethod
+    def gdo_trigger(cls) -> str:
         return 'remember'
 
     def gdo_user_type(self) -> str | None:

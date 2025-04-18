@@ -11,7 +11,8 @@ from gdo.date.Time import Time
 
 class funds(Method):
 
-    def gdo_trigger(self) -> str:
+    @classmethod
+    def gdo_trigger(cls) -> str:
         return 'funds'
 
     def gdo_execute(self) -> GDT:

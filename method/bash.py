@@ -15,7 +15,8 @@ class bash(Method):
     Usage: $bash command here
     """
 
-    def gdo_trigger(self) -> str:
+    @classmethod
+    def gdo_trigger(cls) -> str:
         return 'bash'
 
     def gdo_user_permission(self) -> str | None:

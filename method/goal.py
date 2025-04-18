@@ -8,7 +8,8 @@ from gdo.core.GDT_String import GDT_String
 
 class goal(Method):
 
-    def gdo_trigger(self) -> str:
+    @classmethod
+    def gdo_trigger(cls) -> str:
         return 'gpt.goal'
 
     def gdo_user_permission(self) -> str | None:

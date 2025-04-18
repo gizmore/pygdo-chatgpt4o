@@ -18,7 +18,8 @@ class tune(Method):
 
 	DATE_FORMAT: str = '%Y_%m_%d_%H_%M_%S'
 
-	def gdo_trigger(self) -> str:
+	@classmethod
+	def gdo_trigger(cls) -> str:
 		return "gpt.tune"
 
 	def gdo_user_permission(self) -> str | None:

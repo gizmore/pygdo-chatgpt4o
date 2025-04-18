@@ -8,7 +8,8 @@ from gdo.core.GDT_Name import GDT_Name
 
 class memory(Method):
 
-    def gdo_trigger(self) -> str:
+    @classmethod
+    def gdo_trigger(cls) -> str:
         return 'memory'
 
     def gdo_parameters(self) -> list[GDT]:

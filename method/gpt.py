@@ -21,7 +21,8 @@ class gpt(Method):
     PROCESSING: bool = False
     # LAST_RESPONSE: str = ""
 
-    def gdo_trigger(self) -> str:
+    @classmethod
+    def gdo_trigger(cls) -> str:
         return 'gpt'
 
     @classmethod
