@@ -1,5 +1,6 @@
-import json
 import os
+
+import msgspec.json
 
 from gdo.base.Application import Application
 from gdo.base.GDT import GDT
@@ -73,7 +74,7 @@ class tune(Method):
 		with open(output_path, 'w') as out:
 			for thread in grouped:
 				example = {"messages": thread}
-				jsonl = json.dumps(example)
+				jsonl = msgspec.json.encode(example)
 				if len(jsonl) > 1024:
 					count_too_long += 1
 					continue

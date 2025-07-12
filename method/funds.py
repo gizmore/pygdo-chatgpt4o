@@ -1,8 +1,8 @@
-import json
 import urllib.parse
 from pprint import pprint
 
 import httplib2
+import msgspec.json
 
 from gdo.base.GDT import GDT
 from gdo.base.Method import Method
@@ -23,7 +23,7 @@ class funds(Method):
         start = urllib.parse.quote_plus(Time.get_date(None, '%Y-%m-%d'))
         url = f"https://api.openai.com/v1/dashboard/activity?start_date={start}&end_date={start}"
         response = http.request(url, headers=headers)
-        data = json.loads(response[1])
+        data = msgspec.json.decode(response[1])
         pprint(data)
 
         amount = 0
