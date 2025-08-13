@@ -108,11 +108,11 @@ class gpt(Method):
             from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
             mod = module_chatgpt4o.instance()
             api = mod.get_openai()
-            response = api.chat.completions.create(
+            response = await api.chat.completions.create(
                 model=mod.cfg_model(),
                 messages=messages,
-                temperature=self.cfg_temperature(message),
-                max_tokens=mod.cfg_max_tokens(),
+                # temperature=self.cfg_temperature(message),
+                # max_completion_tokens=mod.cfg_max_tokens(),
             )
             self.__class__.PROCESSING = False
             text = response.choices[0].message.content

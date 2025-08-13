@@ -66,11 +66,12 @@ class module_chatgpt4o(GDO_Module):
             # GDT_String('gpt4_model').not_null().initial('gpt-4o-mini'),  # gpt-4o
             # GDT_String('gpt4_model').not_null().initial('gpt-4o'),  # gpt-4o
             # GDT_String('gpt4_model').not_null().initial('ft:gpt-4o-2024-08-06:personal:chappy:Ae1HhgnK'),  # gpt-4o-ft
-            GDT_String('gpt4_model').not_null().initial('ft:gpt-4o-2024-08-06:personal:source:Ae9lSf9i'),   # chappy + sourcecode 1 epoch
+            # GDT_String('gpt4_model').not_null().initial('ft:gpt-4o-2024-08-06:personal:source:Ae9lSf9i'),   # chappy + sourcecode 1 epoch
+            GDT_String('gpt4_model').not_null().initial('gpt-5-nano'),
 
             GDT_Int('gpt4_max_tokens').min(32).max(8192).initial(512),
-            GDT_String('gpt4_linux_user').initial('chappy'),
-            GDT_Enum('gpt4_mode').choices({'api': 'API', 'web': 'Web'})
+            GDT_String('gpt4_linux_user').initial('capstone'),
+            GDT_Enum('gpt4_mode').choices({'api': 'API', 'web': 'Web'}).not_null().initial('api'),
         ]
 
     def cfg_api_key(self) -> str:
@@ -117,7 +118,7 @@ class module_chatgpt4o(GDO_Module):
 
     def gdo_install(self):
         Files.create_dir(Application.file_path(Application.config('file.directory') + 'chatgpt4o/'))
-        chappy = Bash.get_server().get_or_create_user('chappy')
+        chappy = Bash.get_server().get_or_create_user('capstone')
         chappy.save_val('user_type', GDT_UserType.CHAPPY)
         self.save_config_val('gpt4_chappy', chappy.get_id())
         GDO_Permission.get_or_create(self.PERM_CHAPPY_BOT)
@@ -147,7 +148,7 @@ class module_chatgpt4o(GDO_Module):
             dog = self.cfg_chappy().get_displayname().lower()
             chappy = message._env_server.get_connector().gdo_get_dog_user().get_name().lower()
             text = message._message.lower().rstrip("!?,.{0123456789}\x00\x01\x02\x03").lstrip('$@!.?,')
-            if text.startswith(chappy) or text.startswith('chap') or text.endswith(chappy) or text.startswith(dog) or text.endswith(dog):
+            if text.startswith(chappy) or text.startswith('cap') or text.endswith(chappy) or text.startswith(dog) or text.endswith(dog):
                 if not gpt.PROCESSING:
                     gpt.PROCESSING = True
                     try:
@@ -191,8 +192,8 @@ class module_chatgpt4o(GDO_Module):
     # API #
     #######
     @functools.cache
-    def get_openai(self) -> 'OpenAI':
+    def get_openai(self) -> 'AsyncOpenAI':
         os.environ['OPENAI_API_KEY'] = api_key = self.cfg_api_key()
-        from openai import OpenAI
-        client = OpenAI(api_key=api_key)
+        from openai import AsyncOpenAI
+        client = AsyncOpenAI(api_key=api_key)
         return client
