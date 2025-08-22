@@ -21,13 +21,13 @@ class goal(Method):
         ]
 
     @classmethod
-    def gdo_method_config_user(cls) -> [GDT]:
+    def gdo_method_config_user(cls) -> list[GDT]:
         return [
             GDT_String('goal').initial('Be a kind and helpful - real - AI User!'),
         ]
 
     @classmethod
-    def gdo_method_config_channel(cls) -> [GDT]:
+    def gdo_method_config_channel(cls) -> list[GDT]:
         return [
             GDT_String('goal').initial('Be a kind and helpful - real - AI User!'),
         ]

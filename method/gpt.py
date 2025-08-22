@@ -17,7 +17,7 @@ from gdo.core.GDT_UInt import GDT_UInt
 
 class gpt(Method):
 
-
+    GPT_INCLUDED = False
     PROCESSING: bool = False
     # LAST_RESPONSE: str = ""
 
@@ -35,14 +35,14 @@ class gpt(Method):
         ]
 
     @classmethod
-    def gdo_method_config_user(cls) -> [GDT]:
+    def gdo_method_config_user(cls) -> list[GDT]:
         return [
             GDT_Float('temperature').min(0).max(0.5).initial("0.05"),
             GDT_Float('window_size').min(0).max(50).initial("10"),
         ]
 
     @classmethod
-    def gdo_method_config_channel(cls) -> [GDT]:
+    def gdo_method_config_channel(cls) -> list[GDT]:
         return [
             GDT_Float('temperature').min(0).max(0.8).initial("0.1"),
             GDT_UInt('window_size').min(0).max(100).initial("20"),
@@ -104,8 +104,10 @@ class gpt(Method):
 
     async def send_to_chappy_api(self, message: Message, messages: list):
         try:
-            from openai import InternalServerError, RateLimitError
-            from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
+            if not self.__class__.GPT_INCLUDED:
+                self.__class__.GPT_INCLUDED = True
+                from openai import InternalServerError, RateLimitError
+                from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
             mod = module_chatgpt4o.instance()
             api = mod.get_openai()
             response = await api.chat.completions.create(
