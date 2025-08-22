@@ -17,9 +17,11 @@ from gdo.core.GDT_UInt import GDT_UInt
 
 class gpt(Method):
 
-    GPT_INCLUDED = False
     PROCESSING: bool = False
-    # LAST_RESPONSE: str = ""
+
+    InternalServerError = None
+    RateLimitError = None
+    module_chatgpt4o = None
 
     @classmethod
     def gdo_trigger(cls) -> str:
@@ -104,11 +106,13 @@ class gpt(Method):
 
     async def send_to_chappy_api(self, message: Message, messages: list):
         try:
-            if not self.__class__.GPT_INCLUDED:
-                self.__class__.GPT_INCLUDED = True
+            if not self.__class__.module_chatgpt4o:
                 from openai import InternalServerError, RateLimitError
+                self.__class__.InternalServerError = InternalServerError
+                self.__class__.RateLimitError = RateLimitError
                 from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
-            mod = module_chatgpt4o.instance()
+                self.__class__.module_chatgpt4o = module_chatgpt4o
+            mod = self.__class__.module_chatgpt4o.instance()
             api = mod.get_openai()
             response = await api.chat.completions.create(
                 model=mod.cfg_model(),
@@ -126,10 +130,10 @@ class gpt(Method):
             await message.deliver(False, False)
             await asyncio.sleep(0.3141)
             self.generate_chappy_response(text, message)
-        except RateLimitError as ex:
+        except self.__class__.RateLimitError as ex:
             message.result("Not enough money!")
             await message.deliver(False, False)
-        except InternalServerError as ex:
+        except self.__class__.InternalServerError as ex:
             raise ex
         except Exception as ex:
             Logger.exception(ex)
