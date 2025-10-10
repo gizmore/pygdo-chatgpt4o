@@ -15,7 +15,6 @@ class GPT4oTest(GDOTestCase):
 
     def setUp(self):
         super().setUp()
-        super().setUp()
         Application.init(os.path.dirname(__file__ + "/../../../../"))
         loader = ModuleLoader.instance()
         loader.load_modules_db(True)
