@@ -114,9 +114,9 @@ class module_chatgpt4o(GDO_Module):
     ### Hooks ###
     #############
 
-    def gdo_install(self):
+    async def gdo_install(self):
         Files.create_dir(Application.file_path(Application.config('file.directory') + 'chatgpt4o/'))
-        chappy = Bash.get_server().get_or_create_user('chappy')
+        chappy = await Bash.get_server().get_or_create_user('chappy')
         chappy.save_val('user_type', GDT_UserType.CHAPPY)
         self.save_config_val('gpt4_chappy', chappy.get_id())
         GDO_Permission.get_or_create(self.PERM_CHAPPY_BOT)
