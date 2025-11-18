@@ -87,7 +87,7 @@ class gpt(Method):
 
     async def send_wakeup_to_chappy(self, channel: GDO_Channel):
         system = GDO_User.system()
-        msg = Message(f"", Mode.txt).env_user(system, True).env_channel(channel).env_server(channel.get_server())
+        msg = Message(f"", Mode.render_txt).env_user(system, True).env_channel(channel).env_server(channel.get_server())
         self.env_copy(msg)
         GDO_ChappyMessage.blank({
             'cm_sender': system.get_id(),

@@ -31,7 +31,7 @@ class GPT4oTest(GDOTestCase):
     def test_01_cfg_window_size(self):
         server = GDO_Server.get_by_connector('bash')
         channel = server.get_or_create_channel('test')
-        message = Message("$gpt.goal", Mode.cli).env_server(server).env_channel(channel).env_user(cli_gizmore(), True)
+        message = Message("$gpt.goal", Mode.render_cli).env_server(server).env_channel(channel).env_user(cli_gizmore(), True)
         method = gpt().env_copy(message)
         self.assertEqual("50", method.cfg_window_size(), "Getting window size for channels does not work.")
 
