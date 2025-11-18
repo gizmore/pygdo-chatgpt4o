@@ -10,9 +10,6 @@ from gdo.core.GDT_Enum import GDT_Enum
 from gdo.ui.GDT_Link import GDT_Link
 from gdo.ui.GDT_Page import GDT_Page
 
-if TYPE_CHECKING:
-    from openai import OpenAI
-
 from gdo.base.Application import Application
 from gdo.base.GDO_Module import GDO_Module
 from gdo.base.GDT import GDT

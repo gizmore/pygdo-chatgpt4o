@@ -114,7 +114,7 @@ class GDO_ChappyMessage(GDO):
             'cm_sender': GDO_User.system().get_id(),
             'cm_user': user,
             'cm_channel': message._env_channel.get_id() if message._env_channel else None,
-            'cm_message': message._gdt_result.render(Mode.TXT) if message._gdt_result else message._result,
+            'cm_message': message._gdt_result.render(Mode.txt) if message._gdt_result else message._result,
             'cm_sent': Time.get_date() if mark_sent else None,
         }).insert()
 
