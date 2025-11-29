@@ -121,7 +121,7 @@ class module_chatgpt4o(GDO_Module):
         self.save_config_val('gpt4_chappy', chappy.get_id())
         GDO_Permission.get_or_create(self.PERM_CHAPPY_BOT)
         GDO_Permission.get_or_create(self.PERM_CHAPPY_USER)
-        GDO_UserPermission.grant(chappy, self.PERM_CHAPPY_BOT)
+        await GDO_UserPermission.grant(chappy, self.PERM_CHAPPY_BOT)
 
     def gdo_subscribe_events(self):
         Application.EVENTS.subscribe('new_message', self.on_new_message)
