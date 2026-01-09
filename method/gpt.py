@@ -155,4 +155,3 @@ class gpt(Method):
 
     async def send_to_chappy_web(self, message: Message, messages: list):
         pass
-    
