@@ -1,5 +1,6 @@
 import asyncio
 import re
+from openai import InternalServerError, RateLimitError
 
 from gdo.base.Application import Application
 from gdo.base.GDT import GDT
@@ -67,9 +68,10 @@ class gpt(Method):
         msg = Message(text, self._env_mode).env_copy(self)
         GDO_ChappyMessage.incoming(msg)
         if self._env_channel:
-            return await self.send_channel_to_chappy(msg)
+            await self.send_channel_to_chappy(msg)
         else:
-            return await self.send_user_to_chappy(msg)
+            await self.send_user_to_chappy(msg)
+        return self.empty()
 
     async def send_message_to_chappy(self, message: Message):
         if message._env_channel:
@@ -107,9 +109,6 @@ class gpt(Method):
     async def send_to_chappy_api(self, message: Message, messages: list):
         try:
             if not self.__class__.module_chatgpt4o:
-                from openai import InternalServerError, RateLimitError
-                self.__class__.InternalServerError = InternalServerError
-                self.__class__.RateLimitError = RateLimitError
                 from gdo.chatgpt4o.module_chatgpt4o import module_chatgpt4o
                 self.__class__.module_chatgpt4o = module_chatgpt4o
             mod = self.__class__.module_chatgpt4o.instance()
@@ -130,10 +129,10 @@ class gpt(Method):
             await message.deliver(False, False)
             await asyncio.sleep(0.3141)
             self.generate_chappy_response(text, message)
-        except self.__class__.RateLimitError as ex:
+        except RateLimitError as ex:
             message.result("Not enough money!")
             await message.deliver(False, False)
-        except self.__class__.InternalServerError as ex:
+        except InternalServerError as ex:
             raise ex
         except Exception as ex:
             Logger.exception(ex)
@@ -156,3 +155,4 @@ class gpt(Method):
 
     async def send_to_chappy_web(self, message: Message, messages: list):
         pass
+    
