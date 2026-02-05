@@ -3,4 +3,4 @@ __pycache__/
 node_modules/
 yarn.lock
 secrets.toml
-genome.txt
+secret_genome.txt

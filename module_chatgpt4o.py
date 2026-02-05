@@ -54,7 +54,7 @@ class module_chatgpt4o(GDO_Module):
         except FileNotFoundError:
             pass
         try:
-            genome = Files.get_contents(self.file_path('genome.txt'))
+            genome = Files.get_contents(self.file_path('secret_genome.txt'))
         except FileNotFoundError:
             pass
         return [
