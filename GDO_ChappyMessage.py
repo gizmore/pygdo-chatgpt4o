@@ -96,6 +96,8 @@ class GDO_ChappyMessage(GDO):
         user = None
         if not message._env_channel:
             user = message._thread_user if message._thread_user else message._env_user
+            if not user.is_persisted():
+                return
             user = user.get_id()
         cls.blank({
             'cm_sender': message._env_user.get_id(),
@@ -109,7 +111,10 @@ class GDO_ChappyMessage(GDO):
     def outgoing(cls, message: Message, mark_sent: bool = False):
         user = None
         if not message._env_channel:
-            user = message._thread_user.get_id() if message._thread_user else message._env_user.get_id()
+            user = message._thread_user if message._thread_user else message._env_user
+            if user.is_persisted():
+                return
+            user = user.get_id()
         cls.blank({
             'cm_sender': GDO_User.system().get_id(),
             'cm_user': user,
