@@ -13,6 +13,7 @@ from gdo.ui.GDT_Page import GDT_Page
 from gdo.base.Application import Application
 from gdo.base.GDO_Module import GDO_Module
 from gdo.base.GDT import GDT
+from gdo.base.GDO import GDO
 from gdo.base.Message import Message
 from gdo.base.Util import Files
 from gdo.chatgpt4o.GDO_ChappyMessage import GDO_ChappyMessage
@@ -96,7 +97,7 @@ class module_chatgpt4o(GDO_Module):
     ##########
     # Module #
     ##########
-    def gdo_classes(self):
+    def gdo_classes(self) -> list[type[GDO]]:
         return [
             GDO_ChappyMessage,
             GDO_ChappyBrain,
