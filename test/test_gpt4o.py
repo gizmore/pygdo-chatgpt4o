@@ -7,7 +7,6 @@ from gdo.base.ModuleLoader import ModuleLoader
 from gdo.base.Render import Mode
 from gdo.chatgpt4o.method.gpt import gpt
 from gdo.core.GDO_Server import GDO_Server
-from gdo.core.GDO_Session import GDO_Session
 from gdotest.TestUtil import cli_plug, reinstall_module, cli_gizmore, GDOTestCase, WebPlug
 
 
