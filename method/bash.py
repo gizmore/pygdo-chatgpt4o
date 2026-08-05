@@ -20,7 +20,7 @@ class bash(Method):
         return 'bash'
 
     def gdo_user_permission(self) -> str | None:
-        return GDO_Permission.ADMIN
+        return GDO_Permission.OWNER
 
     def gdo_parameters(self) -> list[GDT]:
         return [
