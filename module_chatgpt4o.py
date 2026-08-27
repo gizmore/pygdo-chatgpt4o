@@ -119,7 +119,7 @@ class module_chatgpt4o(GDO_Module):
         Files.create_dir(Application.file_path(Application.config('dir.files') + 'chatgpt4o/'))
         chappy = await Bash.get_server().get_or_create_user('chappy')
         chappy.save_val('user_type', GDT_UserType.CHAPPY)
-        self.save_config_val('gpt4_chappy', chappy.get_id())
+        await self.save_config_val('gpt4_chappy', chappy.get_id())
         GDO_Permission.get_or_create(self.PERM_CHAPPY_BOT)
         GDO_Permission.get_or_create(self.PERM_CHAPPY_USER)
         await GDO_UserPermission.grant(chappy, self.PERM_CHAPPY_BOT)
